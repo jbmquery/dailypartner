@@ -1,6 +1,8 @@
 //lib/pages/login_page.dart
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'home_page.dart';
+import '../services/navigation_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -80,17 +82,20 @@ class _LoginPageState extends State<LoginPage> {
                       password: password,
                     );
 
+                    // 👇 AQUÍ MISMO (ya lo tienes)
                     if (userData == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Credenciales incorrectas"),
+                          content: Text("Error al iniciar sesión"),
                         ),
                       );
                       return;
                     }
 
-                    // 🔥 No necesitas navegar manualmente
-                    // AuthWrapper detecta el login automáticamente
+                    // 🔥 FORZAMOS ENTRADA (solo para test)
+                    NavigationService.removeAll(context, const HomePage());
+
+                    // 🔥 AuthWrapper hará el resto automáticamente
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF8A5C2), // rosado pastel

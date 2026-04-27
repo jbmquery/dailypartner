@@ -1,3 +1,4 @@
+//lib/services/auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -18,12 +19,22 @@ class AuthService {
 
       String uid = cred.user!.uid;
 
-      DocumentSnapshot doc = await _firestore
-          .collection('usuarios')
-          .doc(uid)
-          .get();
+      DocumentReference ref = _firestore.collection('usuarios').doc(uid);
+      DocumentSnapshot doc = await ref.get();
 
-      if (!doc.exists) return null;
+      // 🧠 SI NO EXISTE → LO CREA AUTOMÁTICAMENTE
+      if (!doc.exists) {
+        await ref.set({
+          'uid': uid,
+          'nombres': 'Usuario',
+          'correo': email,
+          'estado': true,
+          'fecha_creacion': FieldValue.serverTimestamp(),
+        });
+
+        final newDoc = await ref.get();
+        return newDoc.data() as Map<String, dynamic>;
+      }
 
       return doc.data() as Map<String, dynamic>;
     } on FirebaseAuthException catch (e) {
