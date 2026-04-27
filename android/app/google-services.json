@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "315359101174",
+    "project_id": "dailypartner-ca8c0",
+    "storage_bucket": "dailypartner-ca8c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315359101174:android:49568fb018b27f4195ecd7",
+        "android_client_info": {
+          "package_name": "com.example.daily_partner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_IAH-t7VfwHP6IrJRn5dj7Y28AwQLYh0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315359101174:android:a8c091e6a4e3faa195ecd7",
+        "android_client_info": {
+          "package_name": "daily.partner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_IAH-t7VfwHP6IrJRn5dj7Y28AwQLYh0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
