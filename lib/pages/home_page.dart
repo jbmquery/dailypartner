@@ -40,10 +40,10 @@ class HomePage extends StatelessWidget {
                                 label: "Repetitivas",
                                 color: const Color(0xFFB8E0D2),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 5),
                               _actionButton(
                                 icon: Icons.play_arrow,
-                                label: "Empezamos",
+                                label: "Iniciamos",
                                 color: const Color(0xFFF8A5C2),
                               ),
                             ],
@@ -130,7 +130,7 @@ Widget _actionButton({
   required Color color,
 }) {
   return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
     decoration: BoxDecoration(
       color: color,
       borderRadius: BorderRadius.circular(14),
@@ -154,7 +154,6 @@ Widget _actionButton({
 Widget _pendingTasksCard() {
   return Container(
     width: double.infinity,
-    padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(18),
@@ -169,20 +168,35 @@ Widget _pendingTasksCard() {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Tareas pendientes",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF6EC6CA),
+        // 🎀 HEADER CON COLOR
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: const BoxDecoration(
+            color: Color(0xFFEDB2B1),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+          ),
+          child: const Text(
+            "Tareas pendientes de ayer",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
         ),
 
-        const SizedBox(height: 12),
-
-        _taskItem("Lavar ropa"),
-        const SizedBox(height: 10),
-        _taskItem("Ordenar cuarto"),
+        // 📦 CONTENIDO
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _taskItem("Lavar ropa"),
+              const SizedBox(height: 10),
+              _taskItem("Ordenar cuarto"),
+            ],
+          ),
+        ),
       ],
     ),
   );
@@ -208,7 +222,7 @@ Widget _taskItem(String title) {
             const SizedBox(width: 6),
             _miniButton(Icons.close, "YA FUE", Colors.red),
             const SizedBox(width: 6),
-            _miniButton(Icons.refresh, "HOY SI", Colors.orange),
+            _miniButton(Icons.refresh, "HOY LO HAGO", Colors.orange),
           ],
         ),
       ],
@@ -216,23 +230,30 @@ Widget _taskItem(String title) {
   );
 }
 
-Widget _miniButton(IconData icon, String label, Color color) {
+Widget _miniButton(IconData? icon, String label, Color color, {String? emoji}) {
   return Expanded(
     child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Row(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 4),
+          // 👇 ICONO o EMOJI
+          if (emoji != null)
+            Text(emoji, style: const TextStyle(fontSize: 18))
+          else if (icon != null)
+            Icon(icon, size: 18, color: color),
+
+          const SizedBox(height: 4),
+
           Text(
             label,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: FontWeight.bold,
               color: color,
             ),
