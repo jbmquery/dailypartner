@@ -1,4 +1,4 @@
-//lib/pages/chat_page.dart
+// lib/pages/chat_page.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +14,6 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController controller = TextEditingController();
 
   List<Map<String, dynamic>> messages = [];
-
   List<Map<String, dynamic>> tasks = [];
 
   bool waitingTask = true;
@@ -26,11 +25,10 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-
-    messages.add({"text": "¿Qué vas a hacer el día de hoy?", "isUser": false});
+    messages.add({"text": "¿Qué vas a hacer hoy?", "isUser": false});
   }
 
-  // 🔥 CREA OBTIENE EL DAILY DEL DÍA
+  // 🔥 DAILY
   Future<DocumentReference> getOrCreateDaily() async {
     final user = FirebaseAuth.instance.currentUser!;
     final now = DateTime.now();
@@ -52,7 +50,7 @@ class _ChatPageState extends State<ChatPage> {
     return ref;
   }
 
-  // 📝 GUARDAR TAREA
+  // 📝 GUARDAR
   Future<void> saveTaskToDaily(String text, TimeOfDay? time) async {
     final dailyRef = await getOrCreateDaily();
 
@@ -66,27 +64,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  // 📊 GUARDAR MINI PREGUNTAS
-  Future<void> saveMiniQuestions({
-    required int vasos,
-    required String modo,
-    required String productividad,
-    required double energia,
-    required String estres,
-    required String tiempo,
-  }) async {
-    final dailyRef = await getOrCreateDaily();
-
-    await dailyRef.collection('minipreguntas').doc('resumen').set({
-      "vasos": vasos,
-      "modo": modo,
-      "productividad": productividad,
-      "energia": energia,
-      "estres": estres,
-      "tiempo": tiempo,
-    });
-  }
-
+  // 💬 LÓGICA CHAT
   void sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
@@ -96,7 +74,7 @@ class _ChatPageState extends State<ChatPage> {
 
     controller.clear();
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 400));
 
     if (waitingTask) {
       tasks.add({"task": text, "time": selectedTime});
@@ -106,17 +84,14 @@ class _ChatPageState extends State<ChatPage> {
       showTimeSelector = false;
 
       setState(() {
-        messages.add({"text": "¿Tienes otra tarea?", "isUser": false});
+        messages.add({"text": "¿Otra tarea?", "isUser": false});
         waitingTask = false;
         askAnother = true;
       });
     } else if (askAnother) {
       if (text.toLowerCase() == "si") {
         setState(() {
-          messages.add({
-            "text": "Perfecto, dime la siguiente tarea",
-            "isUser": false,
-          });
+          messages.add({"text": "Dale, dime la siguiente", "isUser": false});
           waitingTask = true;
           askAnother = false;
         });
@@ -127,22 +102,17 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void showSummary() {
-    String resumen = "🧾 Tus tareas del día:\n\n";
+    String resumen = "📋 HOY TIENES:\n\n";
 
     for (var t in tasks) {
-      if (t["time"] != null) {
-        resumen += "• ${t["task"]} a las ${t["time"]!.format(context)}\n";
-      } else {
-        resumen += "• ${t["task"]}\n";
-      }
+      resumen += t["time"] != null
+          ? "• ${t["task"]} (${t["time"]!.format(context)})\n"
+          : "• ${t["task"]}\n";
     }
 
     setState(() {
       messages.add({"text": resumen, "isUser": false});
-      messages.add({
-        "text": "🔥 Listo, a romperla hoy. ¡Vamos!",
-        "isUser": false,
-      });
+      messages.add({"text": "🔥 Dale con todo hoy.", "isUser": false});
     });
 
     Future.delayed(const Duration(seconds: 2), () {
@@ -163,78 +133,98 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  // 🎨 BURBUJA ESTILO NOTEBOOK
+  Widget bubble(Map msg) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: msg["isUser"] ? const Color(0xFFF8A5C2) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: Text(
+        msg["text"],
+        style: TextStyle(color: msg["isUser"] ? Colors.white : Colors.black87),
+      ),
+    );
+  }
+
+  // 📓 LINEA DE CUADERNO
+  Widget notebookLine() {
+    return Container(
+      height: 1,
+      color: Colors.grey.withOpacity(0.3),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: const Color(0xFFF9F6F0),
 
       appBar: AppBar(
-        title: const Text("Plan del día"),
+        title: const Text("DAILY PLANNER"),
         backgroundColor: const Color(0xFF6EC6CA),
+        elevation: 0,
       ),
 
       body: Column(
         children: [
-          // 💬 CHAT
+          // 📋 ESTILO HOJA
           Expanded(
-            child: ListView.builder(
+            child: Container(
+              margin: const EdgeInsets.all(12),
               padding: const EdgeInsets.all(12),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final msg = messages[index];
-
-                return Align(
-                  alignment: msg["isUser"]
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: msg["isUser"]
-                          ? const Color(0xFFF8A5C2)
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      msg["text"],
-                      style: TextStyle(
-                        color: msg["isUser"] ? Colors.white : Colors.black,
-                      ),
-                    ),
-                  ),
-                );
-              },
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: ListView.builder(
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  return Column(
+                    crossAxisAlignment: messages[index]["isUser"]
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [bubble(messages[index]), notebookLine()],
+                  );
+                },
+              ),
             ),
           ),
 
-          // ⌨️ INPUT + OPCIONES
+          // ⌨️ INPUT
           Container(
-            padding: const EdgeInsets.all(10),
-            color: Colors.white,
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(color: Colors.white),
             child: Column(
               children: [
                 if (waitingTask)
                   Row(
                     children: [
-                      Checkbox(
+                      const Icon(Icons.alarm, size: 18),
+                      const SizedBox(width: 6),
+                      const Text("Recordatorio"),
+                      const Spacer(),
+                      Switch(
                         value: showTimeSelector,
-                        onChanged: (value) {
+                        onChanged: (v) {
                           setState(() {
-                            showTimeSelector = value!;
+                            showTimeSelector = v;
                           });
                         },
                       ),
-                      const Text("¿Recordatorio?"),
-
                       if (showTimeSelector)
-                        IconButton(
-                          icon: const Icon(Icons.access_time),
+                        TextButton(
                           onPressed: pickTime,
+                          child: Text(
+                            selectedTime != null
+                                ? selectedTime!.format(context)
+                                : "Hora",
+                          ),
                         ),
-
-                      if (selectedTime != null)
-                        Text(selectedTime!.format(context)),
                     ],
                   ),
 
@@ -244,22 +234,19 @@ class _ChatPageState extends State<ChatPage> {
                       child: TextField(
                         controller: controller,
                         decoration: InputDecoration(
-                          hintText: askAnother
-                              ? "Responde: Si / No"
-                              : "Escribe tu tarea...",
+                          hintText: askAnother ? "Sí / No" : "Escribe tarea...",
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         ),
+                        onSubmitted: sendMessage,
                       ),
                     ),
-
                     const SizedBox(width: 8),
-
                     IconButton(
                       icon: const Icon(Icons.send),
-                      color: const Color(0xFF6EC6CA),
                       onPressed: () => sendMessage(controller.text),
+                      color: const Color(0xFF6EC6CA),
                     ),
                   ],
                 ),
