@@ -48,11 +48,11 @@ class _MiniQuestionsState extends State<MiniQuestions> {
 
     await dailyRef.collection('minipreguntas').doc('resumen').set({
       "vasos": waterSelected,
-      "modo": moodSelected.toString(),
+      "modo": moodSelected,
       "productividad": productivitySelected,
       "energia": energySelected,
-      "estres": stressSelected.toString(),
-      "tiempo": weatherSelected.toString(),
+      "estres": stressSelected,
+      "tiempo": weatherSelected,
     }, SetOptions(merge: true)); // 🔥 IMPORTANTE: no sobreescribe todo
   }
 
@@ -67,11 +67,11 @@ class _MiniQuestionsState extends State<MiniQuestions> {
 
       setState(() {
         waterSelected = data["vasos"] ?? 0;
-        moodSelected = int.tryParse(data["modo"] ?? "-1") ?? -1;
+        moodSelected = data["modo"] ?? -1;
         productivitySelected = data["productividad"] ?? -1;
         energySelected = data["energia"] ?? -1;
-        stressSelected = int.tryParse(data["estres"] ?? "-1") ?? -1;
-        weatherSelected = int.tryParse(data["tiempo"] ?? "-1") ?? -1;
+        stressSelected = data["estres"] ?? -1;
+        weatherSelected = data["tiempo"] ?? -1;
       });
     }
   }
