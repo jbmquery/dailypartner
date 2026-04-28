@@ -58,10 +58,10 @@ class _ChatPageState extends State<ChatPage> {
 
     await dailyRef.collection('tareas').add({
       "titulo": text,
-      "estado": "normal",
+      "importancia": "normal",
       "recordatorio": time != null,
       "hora_recordatorio": time != null ? time.format(context) : null,
-      "completo": false,
+      "estado": "pendiente",
       "actualizacion": FieldValue.serverTimestamp(),
     });
   }
