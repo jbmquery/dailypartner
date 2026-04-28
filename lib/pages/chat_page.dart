@@ -1,4 +1,7 @@
+//lib/pages/chat_page.dart
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -27,6 +30,63 @@ class _ChatPageState extends State<ChatPage> {
     messages.add({"text": "¿Qué vas a hacer el día de hoy?", "isUser": false});
   }
 
+  // 🔥 CREA OBTIENE EL DAILY DEL DÍA
+  Future<DocumentReference> getOrCreateDaily() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final now = DateTime.now();
+
+    String fecha = "${now.year}-${now.month}-${now.day}";
+    String docId = "${user.uid}_$fecha";
+
+    final ref = FirebaseFirestore.instance.collection('daily').doc(docId);
+
+    final doc = await ref.get();
+
+    if (!doc.exists) {
+      await ref.set({
+        "uid": user.uid,
+        "fecha_creacion": FieldValue.serverTimestamp(),
+      });
+    }
+
+    return ref;
+  }
+
+  // 📝 GUARDAR TAREA
+  Future<void> saveTaskToDaily(String text, TimeOfDay? time) async {
+    final dailyRef = await getOrCreateDaily();
+
+    await dailyRef.collection('tareas').add({
+      "titulo": text,
+      "estado": "normal",
+      "recordatorio": time != null,
+      "hora_recordatorio": time != null ? time.format(context) : null,
+      "completo": false,
+      "actualizacion": FieldValue.serverTimestamp(),
+    });
+  }
+
+  // 📊 GUARDAR MINI PREGUNTAS
+  Future<void> saveMiniQuestions({
+    required int vasos,
+    required String modo,
+    required String productividad,
+    required double energia,
+    required String estres,
+    required String tiempo,
+  }) async {
+    final dailyRef = await getOrCreateDaily();
+
+    await dailyRef.collection('minipreguntas').doc('resumen').set({
+      "vasos": vasos,
+      "modo": modo,
+      "productividad": productividad,
+      "energia": energia,
+      "estres": estres,
+      "tiempo": tiempo,
+    });
+  }
+
   void sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
@@ -40,6 +100,7 @@ class _ChatPageState extends State<ChatPage> {
 
     if (waitingTask) {
       tasks.add({"task": text, "time": selectedTime});
+      await saveTaskToDaily(text, selectedTime);
 
       selectedTime = null;
       showTimeSelector = false;
