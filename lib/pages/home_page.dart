@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../widgets/app_navbar.dart';
 import '../widgets/app_sidebar.dart';
 import '../services/auth_service.dart';
+import '../widgets/home/miniquestions.dart';
+import 'chat_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -38,18 +40,30 @@ class HomePage extends StatelessWidget {
                               _actionButton(
                                 icon: Icons.repeat,
                                 label: "Repetitivas",
-                                color: const Color(0xFFB8E0D2),
+                                color: const Color.fromARGB(255, 128, 235, 198),
                               ),
                               const SizedBox(width: 5),
                               _actionButton(
                                 icon: Icons.play_arrow,
                                 label: "Iniciamos",
                                 color: const Color(0xFFF8A5C2),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const ChatPage(),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
                         ],
                       ),
+
+                      const SizedBox(height: 20),
+
+                      const MiniQuestions(),
 
                       const SizedBox(height: 20),
 
@@ -128,25 +142,29 @@ Widget _actionButton({
   required IconData icon,
   required String label,
   required Color color,
+  VoidCallback? onTap,
 }) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-    decoration: BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(14),
-    ),
-    child: Row(
-      children: [
-        Icon(icon, size: 18, color: Colors.white),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
@@ -173,7 +191,7 @@ Widget _pendingTasksCard() {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: const BoxDecoration(
-            color: Color(0xFFEDB2B1),
+            color: Color.fromARGB(255, 244, 151, 149),
             borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
           ),
           child: const Text(
