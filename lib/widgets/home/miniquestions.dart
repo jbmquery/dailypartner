@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MiniQuestions extends StatefulWidget {
   const MiniQuestions({super.key});
@@ -19,6 +21,61 @@ class _MiniQuestionsState extends State<MiniQuestions> {
   int stressSelected = -1;
   int weatherSelected = -1;
 
+  // 🔥 OBTENER O CREAR DAILY
+  Future<DocumentReference> getOrCreateDaily() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final now = DateTime.now();
+
+    String fecha = "${now.year}-${now.month}-${now.day}";
+    String docId = "${user.uid}_$fecha";
+
+    final ref = FirebaseFirestore.instance.collection('daily').doc(docId);
+    final doc = await ref.get();
+
+    if (!doc.exists) {
+      await ref.set({
+        "uid": user.uid,
+        "fecha_creacion": FieldValue.serverTimestamp(),
+      });
+    }
+
+    return ref;
+  }
+
+  // 💾 GUARDAR MINI RESPUESTAS
+  Future<void> saveMiniQuestions() async {
+    final dailyRef = await getOrCreateDaily();
+
+    await dailyRef.collection('minipreguntas').doc('resumen').set({
+      "vasos": waterSelected,
+      "modo": moodSelected.toString(),
+      "productividad": productivitySelected,
+      "energia": energySelected,
+      "estres": stressSelected.toString(),
+      "tiempo": weatherSelected.toString(),
+    }, SetOptions(merge: true)); // 🔥 IMPORTANTE: no sobreescribe todo
+  }
+
+  // 📥 CARGAR DATOS
+  Future<void> loadMiniQuestions() async {
+    final dailyRef = await getOrCreateDaily();
+
+    final doc = await dailyRef.collection('minipreguntas').doc('resumen').get();
+
+    if (doc.exists) {
+      final data = doc.data()!;
+
+      setState(() {
+        waterSelected = data["vasos"] ?? 0;
+        moodSelected = int.tryParse(data["modo"] ?? "-1") ?? -1;
+        productivitySelected = data["productividad"] ?? -1;
+        energySelected = data["energia"] ?? -1;
+        stressSelected = int.tryParse(data["estres"] ?? "-1") ?? -1;
+        weatherSelected = int.tryParse(data["tiempo"] ?? "-1") ?? -1;
+      });
+    }
+  }
+
   void nextPage() {
     if (currentPage < 5) {
       // 👈 ahora tienes 6 preguntas (0–5)
@@ -29,6 +86,12 @@ class _MiniQuestionsState extends State<MiniQuestions> {
         curve: Curves.easeInOut,
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadMiniQuestions(); // 🔥 carga lo guardado
   }
 
   @override
@@ -60,10 +123,12 @@ class _MiniQuestionsState extends State<MiniQuestions> {
           bool isActive = index < waterSelected;
 
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
               setState(() {
                 waterSelected = index + 1;
               });
+
+              await saveMiniQuestions();
 
               Future.delayed(const Duration(milliseconds: 300), nextPage);
             },
@@ -102,12 +167,13 @@ class _MiniQuestionsState extends State<MiniQuestions> {
           bool isSelected = moodSelected == index;
 
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
               setState(() {
                 moodSelected = index;
               });
 
-              // aquí podrías seguir con más preguntas luego
+              await saveMiniQuestions();
+              nextPage();
             },
             child: Column(
               children: [
@@ -169,10 +235,13 @@ class _MiniQuestionsState extends State<MiniQuestions> {
               bool active = index < productivitySelected;
 
               return GestureDetector(
-                onTap: () {
+                onTap: () async {
                   setState(() {
                     productivitySelected = index + 1;
                   });
+
+                  await saveMiniQuestions();
+
                   Future.delayed(const Duration(milliseconds: 300), nextPage);
                 },
                 child: Icon(
@@ -216,10 +285,13 @@ class _MiniQuestionsState extends State<MiniQuestions> {
           bool selected = energySelected == index;
 
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
               setState(() {
                 energySelected = index;
               });
+
+              await saveMiniQuestions();
+
               Future.delayed(const Duration(milliseconds: 300), nextPage);
             },
             child: Column(
@@ -255,10 +327,13 @@ class _MiniQuestionsState extends State<MiniQuestions> {
           bool selected = stressSelected == index;
 
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
               setState(() {
                 stressSelected = index;
               });
+
+              await saveMiniQuestions();
+
               Future.delayed(const Duration(milliseconds: 300), nextPage);
             },
             child: Column(
@@ -296,10 +371,12 @@ class _MiniQuestionsState extends State<MiniQuestions> {
           bool selected = weatherSelected == index;
 
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
               setState(() {
                 weatherSelected = index;
               });
+
+              await saveMiniQuestions();
             },
             child: Column(
               children: [

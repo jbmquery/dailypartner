@@ -195,7 +195,7 @@ Widget _pendingTasksCard() {
             borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
           ),
           child: const Text(
-            "Tareas que no hiciste ayer",
+            "Tareas que no hiciste",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
