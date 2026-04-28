@@ -5,6 +5,8 @@ import '../widgets/app_sidebar.dart';
 import '../services/auth_service.dart';
 import '../widgets/home/miniquestions.dart';
 import 'chat_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -170,57 +172,102 @@ Widget _actionButton({
 }
 
 Widget _pendingTasksCard() {
-  return Container(
-    width: double.infinity,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.03),
-          blurRadius: 10,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 🎀 HEADER CON COLOR
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 244, 151, 149),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-          ),
-          child: const Text(
-            "Tareas que no hiciste",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+  final user = FirebaseAuth.instance.currentUser!;
+  final now = DateTime.now();
+  String todayId = "${user.uid}_${now.year}-${now.month}-${now.day}";
+
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance
+        .collection('daily')
+        .where("uid", isEqualTo: user.uid)
+        .snapshots(),
+    builder: (context, dailySnapshot) {
+      if (!dailySnapshot.hasData) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      final dailyDocs = dailySnapshot.data!.docs;
+
+      // 🔥 excluir HOY
+      final pastDays = dailyDocs.where((doc) => doc.id != todayId).toList();
+
+      if (pastDays.isEmpty) {
+        return _emptyCard();
+      }
+
+      return FutureBuilder<List<DocumentSnapshot>>(
+        future: _getPendingTasksFromPast(pastDays),
+        builder: (context, taskSnapshot) {
+          if (!taskSnapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final pendientes = taskSnapshot.data!;
+
+          if (pendientes.isEmpty) {
+            return _emptyCard();
+          }
+
+          return Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
               color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ),
-        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // HEADER
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: Color.fromARGB(255, 244, 151, 149),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(18),
+                    ),
+                  ),
+                  child: const Text(
+                    "Tareas que no hiciste",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
 
-        // 📦 CONTENIDO
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _taskItem("Lavar ropa"),
-
-              const SizedBox(height: 10),
-              _notebookLine(),
-
-              const SizedBox(height: 8),
-              _taskItem("Ordenar cuarto"),
-            ],
-          ),
-        ),
-      ],
-    ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: pendientes.map((doc) {
+                      return Column(
+                        children: [
+                          _taskItemFirestore(doc),
+                          const SizedBox(height: 10),
+                          _notebookLine(),
+                          const SizedBox(height: 10),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
   );
 }
 
@@ -249,6 +296,57 @@ Widget _taskItem(String title) {
   );
 }
 
+Widget _taskItemFirestore(DocumentSnapshot doc) {
+  final data = doc.data() as Map<String, dynamic>;
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        data["titulo"] ?? "",
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+
+      const SizedBox(height: 8),
+
+      Row(
+        children: [
+          _miniButton(
+            Icons.check,
+            "YALA",
+            Colors.green,
+            onTap: () {
+              doc.reference.update({"estado": "completado"});
+            },
+          ),
+
+          const SizedBox(width: 6),
+
+          _miniButton(
+            Icons.close,
+            "YA FUE",
+            Colors.red,
+            onTap: () {
+              doc.reference.update({"estado": "cancelado"});
+            },
+          ),
+
+          const SizedBox(width: 6),
+
+          _miniButton(
+            Icons.refresh,
+            "HOY LO HAGO",
+            Colors.orange,
+            onTap: () {
+              doc.reference.update({"estado": "pendiente"});
+            },
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
 Widget _notebookLine() {
   return Container(
     width: double.infinity,
@@ -257,36 +355,85 @@ Widget _notebookLine() {
   );
 }
 
-Widget _miniButton(IconData? icon, String label, Color color, {String? emoji}) {
+Widget _miniButton(
+  IconData? icon,
+  String label,
+  Color color, {
+  String? emoji,
+  VoidCallback? onTap,
+}) {
   return Expanded(
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // 👇 ICONO o EMOJI
-          if (emoji != null)
-            Text(emoji, style: const TextStyle(fontSize: 18))
-          else if (icon != null)
-            Icon(icon, size: 18, color: color),
+    child: GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 👇 ICONO o EMOJI
+            if (emoji != null)
+              Text(emoji, style: const TextStyle(fontSize: 18))
+            else if (icon != null)
+              Icon(icon, size: 18, color: color),
 
-          const SizedBox(height: 4),
+            const SizedBox(height: 4),
 
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: color,
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );
+}
+
+Future<DocumentReference> getDailyRef() async {
+  final user = FirebaseAuth.instance.currentUser!;
+  final now = DateTime.now();
+
+  String fecha = "${now.year}-${now.month}-${now.day}";
+  String docId = "${user.uid}_$fecha";
+
+  return FirebaseFirestore.instance.collection('daily').doc(docId);
+}
+
+Widget _emptyCard() {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+    ),
+    child: const Center(child: Text("🎉 No tienes tareas pendientes")),
+  );
+}
+
+Future<List<DocumentSnapshot>> _getPendingTasksFromPast(
+  List<QueryDocumentSnapshot> dailyDocs,
+) async {
+  List<DocumentSnapshot> pendientes = [];
+
+  for (var daily in dailyDocs) {
+    final tareasSnapshot = await daily.reference.collection('tareas').get();
+
+    for (var tarea in tareasSnapshot.docs) {
+      if (tarea["estado"] == "pendiente") {
+        pendientes.add(tarea);
+      }
+    }
+  }
+
+  return pendientes;
 }
