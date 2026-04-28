@@ -195,8 +195,9 @@ Widget _pendingTasksCard() {
         return _emptyCard();
       }
 
-      return FutureBuilder<List<DocumentSnapshot>>(
-        future: _getPendingTasksFromPast(pastDays),
+      // 🔥 aquí viene la magia: múltiples streams
+      return StreamBuilder<List<DocumentSnapshot>>(
+        stream: _streamPendingTasksFromPast(pastDays),
         builder: (context, taskSnapshot) {
           if (!taskSnapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -420,20 +421,29 @@ Widget _emptyCard() {
   );
 }
 
-Future<List<DocumentSnapshot>> _getPendingTasksFromPast(
+Stream<List<DocumentSnapshot>> _streamPendingTasksFromPast(
   List<QueryDocumentSnapshot> dailyDocs,
-) async {
-  List<DocumentSnapshot> pendientes = [];
+) async* {
+  List<Stream<QuerySnapshot>> streams = [];
 
   for (var daily in dailyDocs) {
-    final tareasSnapshot = await daily.reference.collection('tareas').get();
-
-    for (var tarea in tareasSnapshot.docs) {
-      if (tarea["estado"] == "pendiente") {
-        pendientes.add(tarea);
-      }
-    }
+    streams.add(daily.reference.collection('tareas').snapshots());
   }
 
-  return pendientes;
+  // 🔥 combinar múltiples streams manualmente
+  await for (var _ in Stream.periodic(const Duration(milliseconds: 500))) {
+    List<DocumentSnapshot> pendientes = [];
+
+    for (var daily in dailyDocs) {
+      final snapshot = await daily.reference.collection('tareas').get();
+
+      for (var tarea in snapshot.docs) {
+        if (tarea["estado"] == "pendiente") {
+          pendientes.add(tarea);
+        }
+      }
+    }
+
+    yield pendientes;
+  }
 }
