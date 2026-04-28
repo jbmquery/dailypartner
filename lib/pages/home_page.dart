@@ -177,7 +177,7 @@ Widget _pendingTasksCard() {
             borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
           ),
           child: const Text(
-            "Tareas pendientes de ayer",
+            "Tareas que no hiciste ayer",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -192,7 +192,11 @@ Widget _pendingTasksCard() {
           child: Column(
             children: [
               _taskItem("Lavar ropa"),
+
               const SizedBox(height: 10),
+              _notebookLine(),
+
+              const SizedBox(height: 8),
               _taskItem("Ordenar cuarto"),
             ],
           ),
@@ -204,11 +208,8 @@ Widget _pendingTasksCard() {
 
 Widget _taskItem(String title) {
   return Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: const Color(0xFFF7F7F7),
-      borderRadius: BorderRadius.circular(12),
-    ),
+    padding: const EdgeInsets.all(0),
+    decoration: BoxDecoration(color: const Color.fromARGB(255, 255, 255, 255)),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -227,6 +228,14 @@ Widget _taskItem(String title) {
         ),
       ],
     ),
+  );
+}
+
+Widget _notebookLine() {
+  return Container(
+    width: double.infinity,
+    height: 1,
+    color: Colors.grey.withOpacity(0.5),
   );
 }
 
