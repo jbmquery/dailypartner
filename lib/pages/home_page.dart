@@ -272,31 +272,6 @@ Widget _pendingTasksCard() {
   );
 }
 
-Widget _taskItem(String title) {
-  return Container(
-    padding: const EdgeInsets.all(0),
-    decoration: BoxDecoration(color: const Color.fromARGB(255, 255, 255, 255)),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-
-        const SizedBox(height: 8),
-
-        Row(
-          children: [
-            _miniButton(Icons.check, "YALA", Colors.green),
-            const SizedBox(width: 6),
-            _miniButton(Icons.close, "YA FUE", Colors.red),
-            const SizedBox(width: 6),
-            _miniButton(Icons.refresh, "HOY LO HAGO", Colors.orange),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
 Widget _taskItemFirestore(DocumentSnapshot doc) {
   final data = doc.data() as Map<String, dynamic>;
 
@@ -338,8 +313,8 @@ Widget _taskItemFirestore(DocumentSnapshot doc) {
             Icons.refresh,
             "HOY LO HAGO",
             Colors.orange,
-            onTap: () {
-              doc.reference.update({"estado": "pendiente"});
+            onTap: () async {
+              await moveTaskToToday(doc);
             },
           ),
         ],
@@ -407,6 +382,44 @@ Future<DocumentReference> getDailyRef() async {
   String docId = "${user.uid}_$fecha";
 
   return FirebaseFirestore.instance.collection('daily').doc(docId);
+}
+
+Future<void> moveTaskToToday(DocumentSnapshot oldTask) async {
+  final user = FirebaseAuth.instance.currentUser!;
+  final now = DateTime.now();
+
+  String fecha = "${now.year}-${now.month}-${now.day}";
+  String todayId = "${user.uid}_$fecha";
+
+  final todayRef = FirebaseFirestore.instance.collection('daily').doc(todayId);
+
+  final todayDoc = await todayRef.get();
+
+  // 🔥 si no existe el daily de hoy, lo crea
+  if (!todayDoc.exists) {
+    await todayRef.set({
+      "uid": user.uid,
+      "fecha_creacion": FieldValue.serverTimestamp(),
+    });
+  }
+
+  final data = oldTask.data() as Map<String, dynamic>;
+
+  // 🚀 copiar tarea al día de hoy
+  await todayRef.collection('tareas').add({
+    "titulo": data["titulo"],
+    "estado": "pendiente",
+    "recordatorio": data["recordatorio"] ?? false,
+    "hora_recordatorio": data["hora_recordatorio"],
+    "completo": false,
+    "actualizacion": FieldValue.serverTimestamp(),
+  });
+
+  // 🏷 marcar tarea antigua como traspasada
+  await oldTask.reference.update({
+    "estado": "traspaso",
+    "actualizacion": FieldValue.serverTimestamp(),
+  });
 }
 
 Widget _emptyCard() {
