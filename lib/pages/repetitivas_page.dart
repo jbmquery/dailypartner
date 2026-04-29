@@ -51,6 +51,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      useSafeArea: true, // 👈 AGREGAR AQUÍ
       builder: (_) => RepetitivasDialog(task: task),
     );
 
@@ -66,7 +67,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
     return Scaffold(
       drawer: const AppSidebar(),
       backgroundColor: const Color(0xFFF7F7F7),
-
+      resizeToAvoidBottomInset: false,
       // FAB FIJO
       floatingActionButton: _showFab
           ? Padding(
@@ -79,124 +80,147 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
             )
           : null,
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AppNavbar(),
-            const SizedBox(height: 20),
+      body: AnimatedPadding(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const AppNavbar(),
+              const SizedBox(height: 20),
 
-            // 🔥 SCROLL GENERAL (clave)
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+              // 🔥 SCROLL GENERAL (clave)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
 
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // HEADER
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
-                          decoration: const BoxDecoration(
-                            color: Color.fromARGB(255, 244, 151, 149),
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(18),
+                        ],
+                      ),
+
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // HEADER
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            decoration: const BoxDecoration(
+                              color: Color.fromARGB(255, 244, 151, 149),
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(18),
+                              ),
+                            ),
+                            child: const Text(
+                              "Tareas repetitivas",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                          child: const Text(
-                            "Tareas repetitivas",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
 
-                        // LISTA (se adapta al contenido)
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(16),
-                          itemCount: tasks.length,
-                          itemBuilder: (context, i) {
-                            final t = tasks[i];
+                          // LISTA (se adapta al contenido)
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.all(16),
+                            itemCount: tasks.length,
+                            itemBuilder: (context, i) {
+                              final t = tasks[i];
 
-                            return Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        t["titulo"] ?? "",
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-
-                                    // ⏰ hora
-                                    if (t["hora"] != null)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
+                              return Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      // 🔴 PUNTO TIPO PLANNER
+                                      Container(
+                                        width: 12,
+                                        height: 12,
+                                        margin: const EdgeInsets.only(
+                                          right: 10,
                                         ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(
+                                            0xFFF49795,
+                                          ), // mismo color del header
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+
+                                      // 📄 TEXTO
+                                      Expanded(
                                         child: Text(
-                                          t["hora"],
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey,
-                                          ),
+                                          t["titulo"] ?? "",
+                                          style: const TextStyle(fontSize: 14),
                                         ),
-                                      )
-                                    else
-                                      const Icon(
-                                        Icons.access_time,
-                                        size: 18,
-                                        color: Colors.grey,
                                       ),
 
-                                    // ✏️ editar
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.edit_outlined,
-                                        size: 20,
-                                      ),
-                                      onPressed: () => openDialog(task: t),
-                                    ),
-                                  ],
-                                ),
+                                      // ⏰ hora
+                                      if (t["hora"] != null)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                          ),
+                                          child: Text(
+                                            t["hora"],
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        )
+                                      else
+                                        const Icon(
+                                          Icons.access_time,
+                                          size: 18,
+                                          color: Colors.grey,
+                                        ),
 
-                                const SizedBox(height: 10),
-                                const Divider(),
-                                const SizedBox(height: 10),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
+                                      // ✏️ editar
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.edit_outlined,
+                                          size: 20,
+                                        ),
+                                        onPressed: () => openDialog(task: t),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 10),
+                                  const Divider(),
+                                  const SizedBox(height: 10),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

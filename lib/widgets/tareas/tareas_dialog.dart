@@ -1,19 +1,16 @@
-//lib/widgets/repetitivas/repetitivas_dialog.dart
+//lib/widgets/tareas/tareas_dialog.dart
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class RepetitivasDialog extends StatefulWidget {
+class TareasDialog extends StatefulWidget {
   final Map<String, dynamic>? task;
 
-  const RepetitivasDialog({super.key, this.task});
+  const TareasDialog({super.key, this.task});
 
   @override
-  State<RepetitivasDialog> createState() => _RepetitivasDialogState();
+  State<TareasDialog> createState() => _TareasDialogState();
 }
 
-class _RepetitivasDialogState extends State<RepetitivasDialog> {
-  final user = FirebaseAuth.instance.currentUser!;
+class _TareasDialogState extends State<TareasDialog> {
   final TextEditingController controller = TextEditingController();
 
   String? time;
@@ -24,7 +21,7 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
 
     if (widget.task != null) {
       controller.text = widget.task!["titulo"] ?? "";
-      time = widget.task!["hora_recordatorio"];
+      time = widget.task!["hora"];
     }
   }
 
@@ -41,40 +38,12 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
     }
   }
 
-  Future<void> save() async {
-    final data = {
-      "uid": user.uid,
-      "titulo": controller.text,
-      "estado": "pendiente",
-      "recordatorio": time != null,
-      "hora_recordatorio": time,
-      "importancia": "normal",
-      "actualizacion": FieldValue.serverTimestamp(),
-    };
-
-    if (widget.task == null) {
-      await FirebaseFirestore.instance
-          .collection('tareas_repetitivas')
-          .add(data);
-    } else {
-      await FirebaseFirestore.instance
-          .collection('tareas_repetitivas')
-          .doc(widget.task!["id"])
-          .update(data);
-    }
-
-    Navigator.pop(context);
+  void save() {
+    Navigator.pop(context, {"titulo": controller.text, "hora": time});
   }
 
-  Future<void> delete() async {
-    if (widget.task != null) {
-      await FirebaseFirestore.instance
-          .collection('tareas_repetitivas')
-          .doc(widget.task!["id"])
-          .delete();
-    }
-
-    Navigator.pop(context);
+  void delete() {
+    Navigator.pop(context, {"delete": true});
   }
 
   @override
@@ -94,7 +63,7 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 🔘 HANDLE
+            // HANDLE
             Container(
               width: 40,
               height: 4,
@@ -105,7 +74,6 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
               ),
             ),
 
-            // 🧠 TITULO
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -119,7 +87,6 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
 
             const SizedBox(height: 14),
 
-            // ✍️ INPUT
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
@@ -130,8 +97,6 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                 controller: controller,
                 autofocus: true,
                 textInputAction: TextInputAction.done,
-                enableSuggestions: false,
-                autocorrect: false,
                 decoration: const InputDecoration(
                   hintText: "¿Qué tienes que hacer?",
                   border: InputBorder.none,
@@ -141,7 +106,6 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
 
             const SizedBox(height: 14),
 
-            // ⏰ HORA
             Row(
               children: [
                 GestureDetector(
@@ -165,10 +129,7 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                         const SizedBox(width: 6),
                         Text(
                           time ?? "Agregar hora",
-                          style: const TextStyle(
-                            color: Color(0xFF6EC6CA),
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: const TextStyle(color: Color(0xFF6EC6CA)),
                         ),
                       ],
                     ),
@@ -179,7 +140,6 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
 
             const SizedBox(height: 20),
 
-            // 🔘 BOTONES
             Row(
               children: [
                 if (widget.task != null)

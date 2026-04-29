@@ -4,7 +4,7 @@ import '../widgets/app_navbar.dart';
 import '../widgets/app_sidebar.dart';
 import '../services/auth_service.dart';
 import '../widgets/home/miniquestions.dart';
-import 'chat_page.dart';
+import 'tareas_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'repetitivas_page.dart';
@@ -63,7 +63,7 @@ class HomePage extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const ChatPage(),
+                                      builder: (context) => const TareasPage(),
                                     ),
                                   );
                                 },
