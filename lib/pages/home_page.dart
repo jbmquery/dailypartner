@@ -7,6 +7,7 @@ import '../widgets/home/miniquestions.dart';
 import 'chat_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'repetitivas_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -43,6 +44,15 @@ class HomePage extends StatelessWidget {
                                 icon: Icons.repeat,
                                 label: "Repetitivas",
                                 color: const Color.fromARGB(255, 128, 235, 198),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const RepetitivasPage(),
+                                    ),
+                                  );
+                                },
                               ),
                               const SizedBox(width: 5),
                               _actionButton(

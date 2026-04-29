@@ -16,6 +16,7 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController controller = TextEditingController();
 
   bool isTyping = false;
+  bool finished = false;
 
   List<Map<String, dynamic>> messages = [];
   List<Map<String, dynamic>> tasks = [];
@@ -66,6 +67,24 @@ class _ChatPageState extends State<ChatPage> {
       "estado": "pendiente",
       "actualizacion": FieldValue.serverTimestamp(),
     });
+  }
+
+  Future<void> saveAllTasks() async {
+    final dailyRef = await getOrCreateDaily();
+
+    for (var t in tasks) {
+      await dailyRef.collection('tareas').add({
+        "titulo": t["task"],
+        "importancia": t["important"] ? "alta" : "normal",
+        "recordatorio": t["time"] != null,
+        "hora_recordatorio": t["time"] ?? null,
+        "estado": "pendiente",
+        "completo": false,
+        "actualizacion": FieldValue.serverTimestamp(),
+      });
+    }
+
+    Navigator.pop(context);
   }
 
   // 🌐 LLAMADA A OPENROUTER
@@ -157,23 +176,25 @@ REGLAS:
     final ctx = await getUserContext();
 
     return """
-Usuario dijo: "$userMessage"
+Extrae tareas del siguiente mensaje.
 
-Tareas actuales:
-${ctx["tareas"]}
+Mensaje:
+"$userMessage"
 
-Tareas repetidas:
-${ctx["repetidas"]}
+Reglas:
+- Devuelve SOLO JSON
+- Formato:
+[
+  {"task": "texto", "time": "HH:mm o null"}
+]
 
-Estado del usuario:
-${ctx["mini"]}
+Ejemplo:
+[
+  {"task": "Lavar uniforme", "time": null},
+  {"task": "Ir a casa de Juan", "time": "15:00"}
+]
 
-INSTRUCCIONES:
-- Detecta duplicados
-- Sugiere tareas
-- Prioriza
-- Motiva si está desanimado
-- Mantente en productividad
+No expliques nada.
 
 Respuesta:
 """;
@@ -183,29 +204,27 @@ Respuesta:
   void sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
-    // 🚫 DETECTAR DUPLICADOS
-    bool existe = tasks.any(
-      (t) => t["task"].toString().toLowerCase() == text.toLowerCase(),
-    );
-
-    if (existe) {
+    // 🛑 DETECTAR FINALIZAR POR TEXTO
+    if (text.toLowerCase().contains("finalizar") ||
+        text.toLowerCase().contains("listo")) {
       setState(() {
-        messages.add({"text": "⚠️ Esa tarea ya la agregaste", "isUser": false});
+        finished = true;
       });
-      return;
-    }
 
-    // 💔 MODO COACH
-    if (text.toLowerCase().contains("no tengo animos")) {
-      setState(() {
-        messages.add({
-          "text": "💪 Empieza con algo pequeño. Solo una tarea.",
-          "isUser": false,
+      // 🔥 Agregar mensaje tipo sistema
+      Future.delayed(const Duration(milliseconds: 300), () {
+        setState(() {
+          messages.add({
+            "text": "📋 Revisa tus tareas antes de guardar 👇",
+            "isUser": false,
+          });
         });
       });
+
       return;
     }
 
+    // 💬 MENSAJE NORMAL
     setState(() {
       messages.add({"text": text, "isUser": true});
       isTyping = true;
@@ -217,34 +236,38 @@ Respuesta:
     String prompt = await buildPrompt(text);
     String aiResponse = await askAI(prompt);
 
+    processAIResponse(aiResponse);
+
     setState(() {
       isTyping = false;
-      messages.add({"text": aiResponse, "isUser": false});
-    });
-
-    // 💾 LÓGICA ORIGINAL (NO LA PERDEMOS)
-    if (waitingTask) {
-      tasks.add({"task": text, "time": selectedTime});
-      await saveTaskToDaily(text, selectedTime);
-
-      selectedTime = null;
-      showTimeSelector = false;
-
-      setState(() {
-        messages.add({"text": "¿Otra tarea?", "isUser": false});
-        waitingTask = false;
-        askAnother = true;
+      messages.add({
+        "text":
+            "✅ Tareas detectadas. Sigue escribiendo o presiona FINALIZAR 👇",
+        "isUser": false,
       });
-    } else if (askAnother) {
-      if (text.toLowerCase() == "si") {
-        setState(() {
-          messages.add({"text": "Dale, dime la siguiente", "isUser": false});
-          waitingTask = true;
-          askAnother = false;
-        });
-      } else {
-        showSummary();
+    });
+  }
+
+  void processAIResponse(String response) {
+    try {
+      final List data = jsonDecode(response);
+
+      for (var item in data) {
+        String task = item["task"];
+        String? time = item["time"];
+
+        bool exists = tasks.any(
+          (t) => t["task"].toLowerCase() == task.toLowerCase(),
+        );
+
+        if (!exists) {
+          tasks.add({"task": task, "time": time, "important": false});
+        }
       }
+
+      setState(() {});
+    } catch (e) {
+      print("Error parseando IA: $e");
     }
   }
 
@@ -347,6 +370,90 @@ Respuesta:
               ),
             ),
           ),
+          // 📋 TABLA DE TAREAS TEMPORALES
+          // 🔘 BOTÓN FINALIZAR
+          if (tasks.isNotEmpty && !finished)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                onPressed: () {
+                  setState(() {
+                    finished = true;
+                    messages.add({
+                      "text": "📋 Revisa tus tareas antes de guardar",
+                      "isUser": false,
+                    });
+                  });
+                },
+                child: const Text("FINALIZAR"),
+              ),
+            ),
+
+          if (tasks.isNotEmpty && finished)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                    "📋 Tus tareas",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  ...tasks.asMap().entries.map((entry) {
+                    int i = entry.key;
+                    var t = entry.value;
+
+                    return Row(
+                      children: [
+                        Checkbox(
+                          value: t["important"] ?? false,
+                          onChanged: (v) {
+                            setState(() {
+                              t["important"] = v ?? false;
+                            });
+                          },
+                        ),
+
+                        Expanded(child: Text(t["task"])),
+
+                        Text(t["time"] ?? ""),
+
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            controller.text = t["task"];
+                          },
+                        ),
+
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            setState(() {
+                              tasks.removeAt(i);
+                            });
+                          },
+                        ),
+                      ],
+                    );
+                  }),
+
+                  const SizedBox(height: 10),
+
+                  ElevatedButton(
+                    onPressed: saveAllTasks,
+                    child: const Text("GUARDAR"),
+                  ),
+                ],
+              ),
+            ),
 
           // ⌨️ INPUT
           Container(
@@ -398,7 +505,9 @@ Respuesta:
                     const SizedBox(width: 8),
                     IconButton(
                       icon: const Icon(Icons.send),
-                      onPressed: () => sendMessage(controller.text),
+                      onPressed: finished
+                          ? null
+                          : () => sendMessage(controller.text),
                       color: const Color(0xFF6EC6CA),
                     ),
                   ],
