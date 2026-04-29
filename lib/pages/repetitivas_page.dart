@@ -13,12 +13,23 @@ class RepetitivasPage extends StatefulWidget {
 
 class _RepetitivasPageState extends State<RepetitivasPage> {
   final user = FirebaseAuth.instance.currentUser!;
+  final FocusNode _focusNode = FocusNode();
+
   List<Map<String, dynamic>> tasks = [];
 
   @override
   void initState() {
     super.initState();
     loadTasks();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    for (var t in tasks) {
+      t["controller"]?.dispose();
+    }
+    super.dispose();
   }
 
   // 🔥 CARGAR DESDE FIRESTORE
@@ -33,7 +44,6 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
         final data = doc.data();
         return {
           "id": doc.id,
-          "task": data["titulo"],
           "time": data["hora_recordatorio"],
           "editing": false,
           "controller": TextEditingController(text: data["titulo"]),
@@ -47,24 +57,29 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
     setState(() {
       tasks.add({
         "id": null,
-        "task": "",
         "time": null,
         "editing": true,
         "controller": TextEditingController(),
       });
     });
+
+    // ⚡ foco suave
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _focusNode.requestFocus();
+    });
   }
 
-  // 💾 GUARDAR EN FIRESTORE
+  // 💾 GUARDAR
   Future<void> saveTask(int index) async {
     var t = tasks[index];
+
     final data = {
       "uid": user.uid,
       "titulo": t["controller"].text,
       "estado": "pendiente",
       "recordatorio": t["time"] != null,
       "hora_recordatorio": t["time"],
-      "importancia": "normal", // Por defecto normal
+      "importancia": "normal",
       "actualizacion": FieldValue.serverTimestamp(),
     };
 
@@ -83,17 +98,23 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
     setState(() {
       t["editing"] = false;
     });
+
+    FocusScope.of(context).unfocus();
   }
 
   // 🗑 ELIMINAR
   Future<void> deleteTask(int index) async {
     var t = tasks[index];
+
     if (t["id"] != null) {
       await FirebaseFirestore.instance
           .collection('tareas_repetitivas')
           .doc(t["id"])
           .delete();
     }
+
+    t["controller"].dispose();
+
     setState(() {
       tasks.removeAt(index);
     });
@@ -119,12 +140,13 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
       drawer: const AppSidebar(),
       backgroundColor: const Color(0xFFF7F7F7),
       resizeToAvoidBottomInset: true,
-      // 1. Botón flotante inferior derecho
+
       floatingActionButton: FloatingActionButton(
         onPressed: addTask,
         backgroundColor: const Color(0xFF6EC6CA),
         child: const Icon(Icons.add, color: Colors.white),
       ),
+
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -132,12 +154,13 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
             children: [
               const AppNavbar(),
               const SizedBox(height: 20),
+
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
-                      // 4. Encabezado personalizado
+                      // HEADER
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
@@ -159,8 +182,8 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                           ),
                         ),
                       ),
-                      // Contenedor blanco para la lista que conecta con el header
-                      // Contenedor blanco para la lista que conecta con el header
+
+                      // LISTA
                       Expanded(
                         child: Container(
                           decoration: const BoxDecoration(
@@ -170,12 +193,16 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                             ),
                           ),
                           child: ListView.separated(
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
                             padding: const EdgeInsets.all(12),
                             itemCount: tasks.length,
-                            separatorBuilder: (context, index) =>
+                            separatorBuilder: (_, __) =>
                                 const Divider(height: 1),
+
                             itemBuilder: (context, i) {
                               var t = tasks[i];
+
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 6,
@@ -183,21 +210,17 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // 🔹 FILA PRINCIPAL
                                     Row(
                                       children: [
-                                        // INPUT
                                         Expanded(
                                           child: TextField(
                                             controller: t["controller"],
+                                            focusNode: t["editing"]
+                                                ? _focusNode
+                                                : null,
                                             enabled: t["editing"],
-                                            autofocus:
-                                                t["editing"], // ⚡ mejora teclado
                                             enableSuggestions: false,
                                             autocorrect: false,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                            ),
                                             decoration: const InputDecoration(
                                               hintText: "Escribe tarea",
                                               border: InputBorder.none,
@@ -205,7 +228,6 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                           ),
                                         ),
 
-                                        // ⏰ ICONO O HORA
                                         t["time"] == null
                                             ? IconButton(
                                                 icon: const Icon(
@@ -236,24 +258,30 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                                 ),
                                               ),
 
-                                        // ✏️ EDITAR
                                         if (!t["editing"])
                                           IconButton(
                                             icon: const Icon(
                                               Icons.edit_outlined,
-                                              color: Colors.blueGrey,
                                               size: 20,
                                             ),
                                             onPressed: () {
                                               setState(() {
                                                 t["editing"] = true;
                                               });
+
+                                              Future.delayed(
+                                                const Duration(
+                                                  milliseconds: 50,
+                                                ),
+                                                () {
+                                                  _focusNode.requestFocus();
+                                                },
+                                              );
                                             },
                                           ),
                                       ],
                                     ),
 
-                                    // 🔻 SEGUNDA FILA
                                     if (t["editing"])
                                       Row(
                                         children: [
@@ -291,6 +319,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
   }
 }
 
+// 🔘 BOTÓN MINI
 Widget _miniButton(
   IconData? icon,
   String label,
@@ -319,7 +348,6 @@ Widget _miniButton(
 
             Text(
               label,
-              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
