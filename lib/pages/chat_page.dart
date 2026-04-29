@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -12,6 +14,8 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController controller = TextEditingController();
+
+  bool isTyping = false;
 
   List<Map<String, dynamic>> messages = [];
   List<Map<String, dynamic>> tasks = [];
@@ -64,18 +68,161 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  // 🌐 LLAMADA A OPENROUTER
+  Future<String> askAI(String prompt) async {
+    const apiKey =
+        "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";
+
+    try {
+      final response = await http.post(
+        Uri.parse("https://openrouter.ai/api/v1/chat/completions"),
+        headers: {
+          "Authorization": "Bearer $apiKey",
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://tuapp.com",
+          "X-Title": "Daily Partner",
+        },
+        body: jsonEncode({
+          "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "messages": [
+            {
+              "role": "system",
+              "content": """
+Eres un asistente de productividad.
+
+REGLAS:
+- SOLO hablas de tareas diarias
+- NO respondes preguntas fuera de productividad
+- Redirige al usuario si se desvía
+- Respuestas cortas
+""",
+            },
+            {"role": "user", "content": prompt},
+          ],
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      // 🧨 DEBUG (IMPORTANTE)
+      print("RESPONSE OPENROUTER:");
+      print(data);
+
+      // ❌ SI VIENE ERROR
+      if (data["error"] != null) {
+        return "⚠️ Error IA: ${data["error"]["message"]}";
+      }
+
+      // ❌ SI NO VIENE choices
+      if (data["choices"] == null) {
+        return "⚠️ La IA no respondió correctamente.";
+      }
+
+      return data["choices"][0]["message"]["content"] ?? "⚠️ Respuesta vacía";
+    } catch (e) {
+      return "⚠️ Error de conexión con IA";
+    }
+  }
+
+  // 📊 CONTEXTO DEL USUARIO (FIRESTORE)
+  Future<Map<String, dynamic>> getUserContext() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final now = DateTime.now();
+
+    String fecha = "${now.year}-${now.month}-${now.day}";
+    String docId = "${user.uid}_$fecha";
+
+    final dailyRef = FirebaseFirestore.instance.collection('daily').doc(docId);
+
+    final tareasSnap = await dailyRef.collection('tareas').get();
+    final miniSnap = await dailyRef
+        .collection('minipreguntas')
+        .doc('resumen')
+        .get();
+
+    final repetidasSnap = await FirebaseFirestore.instance
+        .collection('tareasrepetidas')
+        .where("uid", isEqualTo: user.uid)
+        .get();
+
+    return {
+      "tareas": tareasSnap.docs.map((d) => d["titulo"]).toList(),
+      "mini": miniSnap.data() ?? {},
+      "repetidas": repetidasSnap.docs.map((d) => d["titulo"]).toList(),
+    };
+  }
+
+  // 🧠 CONSTRUIR PROMPT
+  Future<String> buildPrompt(String userMessage) async {
+    final ctx = await getUserContext();
+
+    return """
+Usuario dijo: "$userMessage"
+
+Tareas actuales:
+${ctx["tareas"]}
+
+Tareas repetidas:
+${ctx["repetidas"]}
+
+Estado del usuario:
+${ctx["mini"]}
+
+INSTRUCCIONES:
+- Detecta duplicados
+- Sugiere tareas
+- Prioriza
+- Motiva si está desanimado
+- Mantente en productividad
+
+Respuesta:
+""";
+  }
+
   // 💬 LÓGICA CHAT
   void sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
+    // 🚫 DETECTAR DUPLICADOS
+    bool existe = tasks.any(
+      (t) => t["task"].toString().toLowerCase() == text.toLowerCase(),
+    );
+
+    if (existe) {
+      setState(() {
+        messages.add({"text": "⚠️ Esa tarea ya la agregaste", "isUser": false});
+      });
+      return;
+    }
+
+    // 💔 MODO COACH
+    if (text.toLowerCase().contains("no tengo animos")) {
+      setState(() {
+        messages.add({
+          "text": "💪 Empieza con algo pequeño. Solo una tarea.",
+          "isUser": false,
+        });
+      });
+      return;
+    }
+
     setState(() {
       messages.add({"text": text, "isUser": true});
+      isTyping = true;
     });
 
     controller.clear();
 
-    await Future.delayed(const Duration(milliseconds: 400));
+    // 🧠 IA
+    String prompt = await buildPrompt(text);
+    String aiResponse = await askAI(prompt);
 
+    setState(() {
+      isTyping = false;
+      messages.add({"text": aiResponse, "isUser": false});
+    });
+
+    // 💾 LÓGICA ORIGINAL (NO LA PERDEMOS)
     if (waitingTask) {
       tasks.add({"task": text, "time": selectedTime});
       await saveTaskToDaily(text, selectedTime);
@@ -182,8 +329,14 @@ class _ChatPageState extends State<ChatPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: ListView.builder(
-                itemCount: messages.length,
+                itemCount: messages.length + (isTyping ? 1 : 0),
                 itemBuilder: (context, index) {
+                  if (isTyping && index == messages.length) {
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text("✍️ escribiendo..."),
+                    );
+                  }
                   return Column(
                     crossAxisAlignment: messages[index]["isUser"]
                         ? CrossAxisAlignment.end
@@ -222,7 +375,7 @@ class _ChatPageState extends State<ChatPage> {
                           child: Text(
                             selectedTime != null
                                 ? selectedTime!.format(context)
-                                : "Hora",
+                                : "Escoge la Hora",
                           ),
                         ),
                     ],
