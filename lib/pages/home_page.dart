@@ -447,13 +447,27 @@ Widget _emptyCard() {
 Stream<List<DocumentSnapshot>> _streamPendingTasksFromPast(
   List<QueryDocumentSnapshot> dailyDocs,
 ) async* {
-  List<Stream<QuerySnapshot>> streams = [];
+  final user = FirebaseAuth.instance.currentUser!;
 
-  for (var daily in dailyDocs) {
-    streams.add(daily.reference.collection('tareas').snapshots());
-  }
+  // 🧠 1. TRAER REPETITIVAS (SOLO UNA VEZ)
+  final repetitivasSnapshot = await FirebaseFirestore.instance
+      .collection('tareas_repetitivas')
+      .where("uid", isEqualTo: user.uid)
+      .get();
 
-  // 🔥 combinar múltiples streams manualmente
+  // 🚀 PRO: titulo + hora
+  final repetitivasKeys = repetitivasSnapshot.docs.map((doc) {
+    final data = doc.data();
+    final titulo = (data["titulo"] ?? "").toString().trim().toLowerCase();
+    final hora = (data["hora_recordatorio"] ?? "")
+        .toString()
+        .trim()
+        .toLowerCase();
+
+    return "$titulo|$hora";
+  }).toSet();
+
+  // 🔁 LOOP STREAM
   await for (var _ in Stream.periodic(const Duration(milliseconds: 500))) {
     List<DocumentSnapshot> pendientes = [];
 
@@ -461,8 +475,27 @@ Stream<List<DocumentSnapshot>> _streamPendingTasksFromPast(
       final snapshot = await daily.reference.collection('tareas').get();
 
       for (var tarea in snapshot.docs) {
-        if (tarea["estado"] == "pendiente") {
-          pendientes.add(tarea);
+        final data = tarea.data() as Map<String, dynamic>;
+
+        final titulo = (data["titulo"] ?? "").toString().trim().toLowerCase();
+        final hora = (data["hora_recordatorio"] ?? "")
+            .toString()
+            .trim()
+            .toLowerCase();
+
+        final key = "$titulo|$hora";
+
+        if (data["estado"] == "pendiente") {
+          // 🧠 2. SI EXISTE EN REPETITIVAS → CANCELAR
+          if (repetitivasKeys.contains(key)) {
+            await tarea.reference.update({
+              "estado": "cancelado",
+              "actualizacion": FieldValue.serverTimestamp(),
+            });
+          } else {
+            // ✅ SOLO LOS LIMPIOS
+            pendientes.add(tarea);
+          }
         }
       }
     }

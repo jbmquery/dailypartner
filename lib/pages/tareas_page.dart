@@ -4,6 +4,7 @@ import '../widgets/app_navbar.dart';
 import '../widgets/app_sidebar.dart';
 import '../widgets/tareas/tareas_dialog.dart';
 import 'resumen_page.dart';
+import '../widgets/tareas/tareas_repetitivas.dart';
 
 class TareasPage extends StatefulWidget {
   const TareasPage({super.key});
@@ -233,6 +234,10 @@ class _TareasPageState extends State<TareasPage> {
                             ],
                           ),
                         ),
+                        const SizedBox(height: 20),
+
+                        // 💖 TAREAS REPETITIVAS
+                        const TareasRepetitivasWidget(),
                       ],
                     ),
                   ),

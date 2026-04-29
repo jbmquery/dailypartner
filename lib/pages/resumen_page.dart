@@ -32,23 +32,53 @@ class _ResumenPageState extends State<ResumenPage> {
       return {...t, "source": "temp", "checked": false};
     }).toList();
 
+    // 🧠 SKIP DE HOY
+    final today = DateTime.now().toString().substring(0, 10);
+
+    final skipSnapshot = await FirebaseFirestore.instance
+        .collection('tareas_repetitivas_skip')
+        .where("uid", isEqualTo: user.uid)
+        .where("fecha", isEqualTo: today)
+        .get();
+
+    final skipKeys = skipSnapshot.docs.map((doc) {
+      final data = doc.data();
+      final titulo = (data["titulo"] ?? "").toString().trim().toLowerCase();
+      final hora = (data["hora"] ?? "").toString().trim().toLowerCase();
+
+      return "$titulo|$hora";
+    }).toSet();
+
     // 🔁 REPETITIVAS
     final repetitivasSnapshot = await FirebaseFirestore.instance
         .collection('tareas_repetitivas')
         .where("uid", isEqualTo: user.uid)
         .get();
 
-    List<Map<String, dynamic>> repetitivas = repetitivasSnapshot.docs.map((
-      doc,
-    ) {
-      final data = doc.data();
-      return {
-        "titulo": data["titulo"],
-        "hora": data["hora_recordatorio"],
-        "source": "repetitiva",
-        "checked": false,
-      };
-    }).toList();
+    List<Map<String, dynamic>> repetitivas = repetitivasSnapshot.docs
+        .map((doc) {
+          final data = doc.data();
+
+          final titulo = data["titulo"];
+          final hora = data["hora_recordatorio"];
+
+          final key =
+              "${titulo.toString().trim().toLowerCase()}|${(hora ?? "").toString().trim().toLowerCase()}";
+
+          // 🚫 si está en skip → no entra
+          if (skipKeys.contains(key)) {
+            return null;
+          }
+
+          return {
+            "titulo": titulo,
+            "hora": hora,
+            "source": "repetitiva",
+            "checked": false,
+          };
+        })
+        .whereType<Map<String, dynamic>>()
+        .toList();
 
     // 📅 DAILY (HOY)
     final dailyRef = FirebaseFirestore.instance
