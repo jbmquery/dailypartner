@@ -126,158 +126,202 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            const AppNavbar(),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  // 4. Encabezado personalizado
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 128, 235, 198),
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(18),
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Column(
+            children: [
+              const AppNavbar(),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    // 4. Encabezado personalizado
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: Color.fromARGB(255, 128, 235, 198),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(18),
+                        ),
+                      ),
+                      child: const Text(
+                        "Tareas repetitivas",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      "Tareas repetitivas",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    // Contenedor blanco para la lista que conecta con el header
+                    Container(
+                      decoration: const BoxDecoration(
                         color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          bottom: Radius.circular(18),
+                        ),
                       ),
-                    ),
-                  ),
-                  // Contenedor blanco para la lista que conecta con el header
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(18),
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.6,
                       ),
-                    ),
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.6,
-                    ),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(12),
-                      itemCount: tasks.length,
-                      separatorBuilder: (context, index) =>
-                          const Divider(height: 1),
-                      itemBuilder: (context, i) {
-                        var t = tasks[i];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // 🔹 FILA PRINCIPAL
-                              Row(
-                                children: [
-                                  // INPUT
-                                  Expanded(
-                                    child: TextField(
-                                      controller: t["controller"],
-                                      enabled: t["editing"],
-                                      style: const TextStyle(fontSize: 14),
-                                      decoration: const InputDecoration(
-                                        hintText: "Escribe tarea",
-                                        border: InputBorder.none,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(12),
+                        itemCount: tasks.length,
+                        separatorBuilder: (context, index) =>
+                            const Divider(height: 1),
+                        itemBuilder: (context, i) {
+                          var t = tasks[i];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 🔹 FILA PRINCIPAL
+                                Row(
+                                  children: [
+                                    // INPUT
+                                    Expanded(
+                                      child: TextField(
+                                        controller: t["controller"],
+                                        enabled: t["editing"],
+                                        style: const TextStyle(fontSize: 14),
+                                        decoration: const InputDecoration(
+                                          hintText: "Escribe tarea",
+                                          border: InputBorder.none,
+                                        ),
                                       ),
                                     ),
-                                  ),
 
-                                  // ⏰ ICONO O HORA (SOLO UNO)
-                                  t["time"] == null
-                                      ? IconButton(
-                                          icon: const Icon(
-                                            Icons.access_time,
-                                            size: 20,
-                                            color: Colors.grey,
-                                          ),
-                                          onPressed: t["editing"]
-                                              ? () => pickTime(i)
-                                              : null,
-                                        )
-                                      : GestureDetector(
-                                          onTap: t["editing"]
-                                              ? () => pickTime(i)
-                                              : null,
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
+                                    // ⏰ ICONO O HORA (SOLO UNO)
+                                    t["time"] == null
+                                        ? IconButton(
+                                            icon: const Icon(
+                                              Icons.access_time,
+                                              size: 20,
+                                              color: Colors.grey,
                                             ),
-                                            child: Text(
-                                              t["time"],
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey,
+                                            onPressed: t["editing"]
+                                                ? () => pickTime(i)
+                                                : null,
+                                          )
+                                        : GestureDetector(
+                                            onTap: t["editing"]
+                                                ? () => pickTime(i)
+                                                : null,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                  ),
+                                              child: Text(
+                                                t["time"],
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey,
+                                                ),
                                               ),
                                             ),
                                           ),
+
+                                    // ✏️ EDITAR
+                                    if (!t["editing"])
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.edit_outlined,
+                                          color: Colors.blueGrey,
+                                          size: 20,
                                         ),
-
-                                  // ✏️ EDITAR
-                                  if (!t["editing"])
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.edit_outlined,
-                                        color: Colors.blueGrey,
-                                        size: 20,
+                                        onPressed: () {
+                                          setState(() {
+                                            t["editing"] = true;
+                                          });
+                                        },
                                       ),
-                                      onPressed: () {
-                                        setState(() {
-                                          t["editing"] = true;
-                                        });
-                                      },
-                                    ),
-                                ],
-                              ),
-
-                              // 🔻 SEGUNDA FILA (SOLO EN EDICIÓN)
-                              if (t["editing"])
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.check,
-                                        color: Colors.green,
-                                        size: 20,
-                                      ),
-                                      onPressed: () => saveTask(i),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.redAccent,
-                                        size: 20,
-                                      ),
-                                      onPressed: () => deleteTask(i),
-                                    ),
                                   ],
                                 ),
-                            ],
-                          ),
-                        );
-                      },
+
+                                // 🔻 SEGUNDA FILA (SOLO EN EDICIÓN)
+                                if (t["editing"])
+                                  Row(
+                                    children: [
+                                      _miniButton(
+                                        Icons.check,
+                                        "LISTO",
+                                        Colors.green,
+                                        onTap: () => saveTask(i),
+                                      ),
+
+                                      const SizedBox(width: 6),
+
+                                      _miniButton(
+                                        Icons.delete_outline,
+                                        "ELIMINAR",
+                                        Colors.red,
+                                        onTap: () => deleteTask(i),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget _miniButton(
+  IconData? icon,
+  String label,
+  Color color, {
+  String? emoji,
+  VoidCallback? onTap,
+}) {
+  return Expanded(
+    child: GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (emoji != null)
+              Text(emoji, style: const TextStyle(fontSize: 18))
+            else if (icon != null)
+              Icon(icon, size: 18, color: color),
+
+            const SizedBox(height: 4),
+
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: color,
               ),
             ),
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
 }
