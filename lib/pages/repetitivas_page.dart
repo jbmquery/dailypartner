@@ -1,3 +1,4 @@
+//lib/widgets/home/miniquestions.dart
 import 'package:flutter/material.dart';
 import '../widgets/app_navbar.dart';
 import '../widgets/app_sidebar.dart';
@@ -14,6 +15,7 @@ class RepetitivasPage extends StatefulWidget {
 
 class _RepetitivasPageState extends State<RepetitivasPage> {
   final user = FirebaseAuth.instance.currentUser!;
+  bool _showFab = true;
   List<Map<String, dynamic>> tasks = [];
 
   @override
@@ -41,12 +43,20 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
   }
 
   void openDialog({Map<String, dynamic>? task}) async {
+    setState(() {
+      _showFab = false; // 👈 ocultar FAB
+    });
+
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => RepetitivasDialog(task: task),
     );
+
+    setState(() {
+      _showFab = true; // 👈 mostrar FAB otra vez
+    });
 
     loadTasks(); // refrescar
   }
@@ -57,15 +67,17 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
       drawer: const AppSidebar(),
       backgroundColor: const Color(0xFFF7F7F7),
 
-      // 🔥 FAB FIJO (NO SUBE CON TECLADO)
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: FloatingActionButton(
-          onPressed: () => openDialog(),
-          backgroundColor: const Color(0xFF6EC6CA),
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
-      ),
+      // FAB FIJO
+      floatingActionButton: _showFab
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: FloatingActionButton(
+                onPressed: () => openDialog(),
+                backgroundColor: const Color(0xFF6EC6CA),
+                child: const Icon(Icons.add, color: Colors.white),
+              ),
+            )
+          : null,
 
       body: SafeArea(
         child: Column(
@@ -73,52 +85,56 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
             const AppNavbar(),
             const SizedBox(height: 20),
 
+            // 🔥 SCROLL GENERAL (clave)
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
 
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // HEADER
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 244, 151, 149),
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(18),
+                      ],
+                    ),
+
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // HEADER
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 244, 151, 149),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(18),
+                            ),
+                          ),
+                          child: const Text(
+                            "Tareas repetitivas",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                        child: const Text(
-                          "Tareas repetitivas",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
 
-                      // LISTA
-                      Expanded(
-                        child: ListView.builder(
+                        // LISTA (se adapta al contenido)
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
                           padding: const EdgeInsets.all(16),
                           itemCount: tasks.length,
                           itemBuilder: (context, i) {
@@ -174,8 +190,8 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                             );
                           },
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
