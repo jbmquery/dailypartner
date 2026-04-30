@@ -287,79 +287,96 @@ class _ResumenPageState extends State<ResumenPage> {
                             ),
 
                             // LISTA
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              padding: const EdgeInsets.all(16),
-                              itemCount: allTasks.length,
-                              itemBuilder: (context, i) {
-                                final t = allTasks[i];
-
-                                return Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        // ✅ CHECKBOX
-                                        Checkbox(
-                                          value: t["checked"],
-                                          onChanged: (val) {
-                                            setState(() {
-                                              t["checked"] = val;
-                                            });
-                                          },
+                            allTasks.isEmpty
+                                ? Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(20),
+                                    child: const Center(
+                                      child: Text(
+                                        "No hay tareas para hoy 💤\nAgrega algunas antes de continuar",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
                                         ),
-
-                                        // 🔴 PUNTO SEGÚN ORIGEN
-                                        Container(
-                                          width: 10,
-                                          height: 10,
-                                          margin: const EdgeInsets.only(
-                                            right: 10,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: getColor(t["source"]),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-
-                                        Expanded(
-                                          child: Text(
-                                            t["titulo"] ?? "",
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-
-                                        if (t["hora"] != null)
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                            ),
-                                            child: Text(
-                                              t["hora"],
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          )
-                                        else
-                                          const Icon(
-                                            Icons.access_time,
-                                            size: 18,
-                                            color: Colors.grey,
-                                          ),
-                                      ],
+                                      ),
                                     ),
+                                  )
+                                : ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    padding: const EdgeInsets.all(16),
+                                    itemCount: allTasks.length,
+                                    itemBuilder: (context, i) {
+                                      final t = allTasks[i];
 
-                                    const SizedBox(height: 10),
-                                    const Divider(),
-                                    const SizedBox(height: 10),
-                                  ],
-                                );
-                              },
-                            ),
+                                      return Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              // ✅ CHECKBOX
+                                              Checkbox(
+                                                value: t["checked"],
+                                                onChanged: (val) {
+                                                  setState(() {
+                                                    t["checked"] = val;
+                                                  });
+                                                },
+                                              ),
+
+                                              // 🔴 PUNTO SEGÚN ORIGEN
+                                              Container(
+                                                width: 10,
+                                                height: 10,
+                                                margin: const EdgeInsets.only(
+                                                  right: 10,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: getColor(t["source"]),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+
+                                              Expanded(
+                                                child: Text(
+                                                  t["titulo"] ?? "",
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ),
+
+                                              if (t["hora"] != null)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                      ),
+                                                  child: Text(
+                                                    t["hora"],
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                )
+                                              else
+                                                const Icon(
+                                                  Icons.access_time,
+                                                  size: 18,
+                                                  color: Colors.grey,
+                                                ),
+                                            ],
+                                          ),
+
+                                          const SizedBox(height: 8),
+                                          const Divider(height: 1),
+                                          const SizedBox(height: 8),
+                                        ],
+                                      );
+                                    },
+                                  ),
                           ],
                         ),
                       ),
