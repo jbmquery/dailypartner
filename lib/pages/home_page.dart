@@ -8,6 +8,7 @@ import 'tareas_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'repetitivas_page.dart';
+import '../widgets/home/tareas_list.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -81,6 +82,9 @@ class HomePage extends StatelessWidget {
 
                       // 📋 TAREAS PENDIENTES
                       _pendingTasksCard(),
+                      const SizedBox(height: 20),
+
+                      const TareasListWidget(),
 
                       const SizedBox(height: 20),
 
