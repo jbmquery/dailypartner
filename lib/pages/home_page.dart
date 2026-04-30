@@ -24,8 +24,6 @@ class HomePage extends StatelessWidget {
           children: [
             const AppNavbar(),
 
-            const SizedBox(height: 20),
-
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),

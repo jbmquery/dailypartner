@@ -47,14 +47,56 @@ class TareasListWidget extends StatelessWidget {
               // HEADER
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: const BoxDecoration(
                   color: Color(0xFF6EC6CA),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
                 ),
-                child: const Text(
-                  "Tus tareas de hoy",
-                  style: TextStyle(color: Colors.white),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Tus tareas de hoy",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    // ➕ BOTÓN AGREGAR
+                    GestureDetector(
+                      onTap: () async {
+                        final dailyRef = FirebaseFirestore.instance
+                            .collection('daily')
+                            .doc(todayId);
+
+                        final dailyDoc = await dailyRef.get();
+
+                        // 🔥 si no existe el daily → crear
+                        if (!dailyDoc.exists) {
+                          await dailyRef.set({
+                            "uid": user.uid,
+                            "fecha_creacion": FieldValue.serverTimestamp(),
+                          });
+                        }
+
+                        // 🚀 abrir dialog en modo CREAR
+                        await showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => TareasListDialog(
+                            taskDoc: null,
+                            dailyRef: dailyRef,
+                          ),
+                        );
+                      },
+                      child: const Icon(Icons.add, color: Colors.white),
+                    ),
+                  ],
                 ),
               ),
 
@@ -67,7 +109,7 @@ class TareasListWidget extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: docs.length,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(8),
                       itemBuilder: (context, i) {
                         final doc = docs[i];
                         final data = doc.data() as Map<String, dynamic>;
