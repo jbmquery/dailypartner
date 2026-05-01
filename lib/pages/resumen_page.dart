@@ -1,8 +1,11 @@
+//lib/pages/resumen_page.dart
 import 'package:flutter/material.dart';
 import '../widgets/app_navbar.dart';
 import '../widgets/app_sidebar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../services/daily_status_service.dart';
+import 'home_page.dart';
 
 class ResumenPage extends StatefulWidget {
   final List<Map<String, dynamic>> tareasTemporales;
@@ -15,7 +18,7 @@ class ResumenPage extends StatefulWidget {
 
 class _ResumenPageState extends State<ResumenPage> {
   final user = FirebaseAuth.instance.currentUser!;
-
+  bool isSaving = false;
   List<Map<String, dynamic>> allTasks = [];
 
   @override
@@ -112,17 +115,23 @@ class _ResumenPageState extends State<ResumenPage> {
   Color getColor(String source) {
     switch (source) {
       case "daily":
-        return Colors.orange;
+        return const Color.fromRGBO(244, 151, 149, 1);
       case "repetitiva":
-        return Colors.pink;
+        return const Color.fromRGBO(215, 150, 192, 1);
       case "temp":
-        return const Color(0xFF6EC6CA);
+        return const Color.fromRGBO(245, 134, 169, 1);
       default:
         return Colors.grey;
     }
   }
 
   Future<void> saveAll() async {
+    if (isSaving) return; // 🚫 evita doble click
+
+    setState(() {
+      isSaving = true;
+    });
+
     final now = DateTime.now();
     String todayId = "${user.uid}_${now.year}-${now.month}-${now.day}";
 
@@ -143,13 +152,11 @@ class _ResumenPageState extends State<ResumenPage> {
       final importancia = task["checked"] ? "alta" : "normal";
 
       if (task["source"] == "daily") {
-        // 🔄 actualizar
         await dailyRef.collection('tareas').doc(task["id"]).update({
           "importancia": importancia,
           "actualizacion": FieldValue.serverTimestamp(),
         });
       } else {
-        // ➕ crear nueva
         await dailyRef.collection('tareas').add({
           "titulo": task["titulo"],
           "estado": "pendiente",
@@ -160,7 +167,13 @@ class _ResumenPageState extends State<ResumenPage> {
       }
     }
 
-    Navigator.pop(context);
+    await DailyStatusService.setResumenCompletado();
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const HomePage()),
+      (route) => false,
+    );
   }
 
   @override
@@ -183,66 +196,78 @@ class _ResumenPageState extends State<ResumenPage> {
                   child: Column(
                     children: [
                       // 🔘 BOTONES
-                      Row(
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6EC6CA),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // 🔙 ATRÁS
+                            GestureDetector(
                               onTap: () {
                                 Navigator.pop(context);
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                margin: const EdgeInsets.only(
-                                  bottom: 14,
-                                  right: 6,
+                                  horizontal: 12,
+                                  vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(14),
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Center(
-                                  child: Text(
-                                    "Atrás",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                child: const Text(
+                                  "Atrás",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
                                   ),
                                 ),
                               ),
                             ),
-                          ),
 
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: saveAll,
+                            // 💾 GUARDAR
+                            GestureDetector(
+                              onTap: isSaving ? null : saveAll,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                margin: const EdgeInsets.only(
-                                  bottom: 14,
-                                  left: 6,
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF6EC6CA),
-                                  borderRadius: BorderRadius.circular(14),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Center(
-                                  child: Text(
-                                    "Guardar",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
+                                child: isSaving
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Color(0xFF6EC6CA),
+                                        ),
+                                      )
+                                    : const Text(
+                                        "Guardar",
+                                        style: TextStyle(
+                                          color: Color(0xFF6EC6CA),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
 
                       // 📦 CARD
@@ -271,13 +296,13 @@ class _ResumenPageState extends State<ResumenPage> {
                                 vertical: 10,
                               ),
                               decoration: const BoxDecoration(
-                                color: Color(0xFF6EC6CA),
+                                color: Color.fromRGBO(61, 170, 216, 1),
                                 borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(18),
                                 ),
                               ),
                               child: const Text(
-                                "Resumen del día",
+                                "Las prioridades del día son:",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -318,6 +343,14 @@ class _ResumenPageState extends State<ResumenPage> {
                                               // ✅ CHECKBOX
                                               Checkbox(
                                                 value: t["checked"],
+                                                activeColor:
+                                                    const Color.fromRGBO(
+                                                      61,
+                                                      170,
+                                                      216,
+                                                      1,
+                                                    ),
+
                                                 onChanged: (val) {
                                                   setState(() {
                                                     t["checked"] = val;

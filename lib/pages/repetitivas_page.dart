@@ -123,7 +123,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                               vertical: 10,
                             ),
                             decoration: const BoxDecoration(
-                              color: Color.fromARGB(255, 244, 151, 149),
+                              color: Color.fromRGBO(215, 150, 192, 1),
                               borderRadius: BorderRadius.vertical(
                                 top: Radius.circular(18),
                               ),
@@ -174,7 +174,12 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                                 right: 10,
                                               ),
                                               decoration: const BoxDecoration(
-                                                color: Color(0xFFF49795),
+                                                color: Color.fromRGBO(
+                                                  215,
+                                                  150,
+                                                  192,
+                                                  1,
+                                                ),
                                                 shape: BoxShape.circle,
                                               ),
                                             ),

@@ -67,13 +67,13 @@ class TareasInconclusasWidget extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFF49795),
+                      color: Color.fromRGBO(244, 151, 149, 1),
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
                     ),
                     child: const Text(
-                      "Tareas pendientes de hoy",
+                      "Tareas pendientes",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -89,7 +89,7 @@ class TareasInconclusasWidget extends StatelessWidget {
                           padding: const EdgeInsets.all(20),
                           child: const Center(
                             child: Text(
-                              "No hay tareas pendientes hoy 🎉",
+                              "Excelente, estamos al día 🎉",
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
@@ -118,7 +118,7 @@ class TareasInconclusasWidget extends StatelessWidget {
                                       height: 10,
                                       margin: const EdgeInsets.only(right: 10),
                                       decoration: const BoxDecoration(
-                                        color: Color(0xFFF49795),
+                                        color: Color.fromRGBO(244, 151, 149, 1),
                                         shape: BoxShape.circle,
                                       ),
                                     ),

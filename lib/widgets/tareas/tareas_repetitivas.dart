@@ -73,7 +73,7 @@ class TareasRepetitivasWidget extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFF8A5C2),
+                      color: Color.fromRGBO(215, 150, 192, 1),
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
@@ -131,7 +131,12 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                       decoration: BoxDecoration(
                                         color: isSkipped
                                             ? Colors.grey
-                                            : const Color(0xFFF8A5C2),
+                                            : const Color.fromRGBO(
+                                                215,
+                                                150,
+                                                192,
+                                                1,
+                                              ),
                                         shape: BoxShape.circle,
                                       ),
                                     ),

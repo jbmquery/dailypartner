@@ -126,7 +126,7 @@ class _TareasPageState extends State<TareasPage> {
                                   vertical: 10,
                                 ),
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFF6EC6CA),
+                                  color: Color.fromRGBO(245, 134, 169, 1),
                                   borderRadius: BorderRadius.vertical(
                                     top: Radius.circular(18),
                                   ),
@@ -177,8 +177,11 @@ class _TareasPageState extends State<TareasPage> {
                                                   ),
                                                   decoration:
                                                       const BoxDecoration(
-                                                        color: Color(
-                                                          0xFF6EC6CA,
+                                                        color: Color.fromRGBO(
+                                                          245,
+                                                          134,
+                                                          169,
+                                                          1,
                                                         ),
                                                         shape: BoxShape.circle,
                                                       ),

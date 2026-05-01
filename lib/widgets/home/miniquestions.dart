@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/streak_service.dart';
 
 class MiniQuestions extends StatefulWidget {
   const MiniQuestions({super.key});
@@ -116,7 +117,7 @@ class _MiniQuestionsState extends State<MiniQuestions> {
   // 💧 PREGUNTA AGUA
   Widget _waterQuestion() {
     return _card(
-      title: "¿Cuántos vasos de agua has tomado?",
+      title: "¿Cuántos vasos de agua vas tomado?",
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(8, (index) {
@@ -129,6 +130,7 @@ class _MiniQuestionsState extends State<MiniQuestions> {
               });
 
               await saveMiniQuestions();
+              await StreakService.updateStreak();
 
               Future.delayed(const Duration(milliseconds: 300), nextPage);
             },

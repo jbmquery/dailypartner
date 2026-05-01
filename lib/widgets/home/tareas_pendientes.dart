@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/daily_status_service.dart';
 
 class TareasPendientesWidget extends StatelessWidget {
   const TareasPendientesWidget({super.key});
@@ -38,6 +39,7 @@ class TareasPendientesWidget extends StatelessWidget {
             final pendientes = taskSnapshot.data!;
 
             if (pendientes.isEmpty) {
+              DailyStatusService.setPendientesResueltos();
               return _emptyCard();
             }
 
@@ -64,7 +66,7 @@ class TareasPendientesWidget extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 244, 151, 149),
+                      color: Color.fromRGBO(244, 151, 149, 1),
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
