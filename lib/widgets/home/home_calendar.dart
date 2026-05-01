@@ -25,7 +25,7 @@ class HomeCalendarBar extends StatelessWidget {
       context: context,
       builder: (_) {
         return Dialog(
-          backgroundColor: theme.cardColor, // 🔥 dinámico
+          backgroundColor: theme.colorScheme.surface, // 🔥 dinámico correcto
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
@@ -49,12 +49,15 @@ class HomeCalendarBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final primary = theme.colorScheme.primary;
+    final onPrimary = theme.colorScheme.onPrimary;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary, // 🔥 dinámico
+        color: primary,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -65,12 +68,12 @@ class HomeCalendarBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: onPrimary.withOpacity(0.2), // 🔥 dinámico
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.calendar_month,
-                color: Colors.white,
+                color: onPrimary, // 🔥 dinámico
                 size: 20,
               ),
             ),
@@ -83,7 +86,7 @@ class HomeCalendarBar extends StatelessWidget {
             child: Text(
               getTodayText(),
               style: TextStyle(
-                color: Colors.white,
+                color: onPrimary, // 🔥 dinámico
                 fontSize: 13,
                 height: 1.2,
                 fontWeight: FontWeight.w500,
@@ -97,13 +100,13 @@ class HomeCalendarBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.cardColor, // 🔥 dinámico
+                color: theme.colorScheme.surface, // 🔥 dinámico correcto
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 "Siguiente",
                 style: TextStyle(
-                  color: theme.colorScheme.primary, // 🔥 dinámico
+                  color: primary, // 🔥 dinámico
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),

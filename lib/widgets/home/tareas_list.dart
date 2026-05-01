@@ -9,6 +9,8 @@ class TareasListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🔥 NUEVO
+
     final user = FirebaseAuth.instance.currentUser!;
     final now = DateTime.now();
 
@@ -38,7 +40,7 @@ class TareasListWidget extends StatelessWidget {
         return Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor, // 🔥 dinámico
             borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
@@ -51,17 +53,19 @@ class TareasListWidget extends StatelessWidget {
                   horizontal: 12,
                   vertical: 10,
                 ),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF6EC6CA),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary, // 🔥 dinámico
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(18),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Tus tareas de hoy",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary, // 🔥 dinámico
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -75,7 +79,6 @@ class TareasListWidget extends StatelessWidget {
 
                         final dailyDoc = await dailyRef.get();
 
-                        // 🔥 si no existe el daily → crear
                         if (!dailyDoc.exists) {
                           await dailyRef.set({
                             "uid": user.uid,
@@ -83,7 +86,6 @@ class TareasListWidget extends StatelessWidget {
                           });
                         }
 
-                        // 🚀 abrir dialog en modo CREAR
                         await showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
@@ -94,16 +96,26 @@ class TareasListWidget extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const Icon(Icons.add, color: Colors.white),
+                      child: Icon(
+                        Icons.add,
+                        color: theme.colorScheme.onPrimary, // 🔥 dinámico
+                      ),
                     ),
                   ],
                 ),
               ),
 
               docs.isEmpty
-                  ? const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Center(child: Text("No hay tareas hoy 👀")),
+                  ? Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Center(
+                        child: Text(
+                          "No hay tareas hoy 👀",
+                          style: TextStyle(
+                            color: theme.textTheme.bodyMedium?.color,
+                          ),
+                        ),
+                      ),
                     )
                   : ListView.builder(
                       shrinkWrap: true,
@@ -127,6 +139,8 @@ class TareasListWidget extends StatelessWidget {
                                 // ✅ CHECK
                                 Checkbox(
                                   value: isDone,
+                                  activeColor:
+                                      theme.colorScheme.primary, // 🔥 dinámico
                                   onChanged: (val) {
                                     doc.reference.update({
                                       "estado": val!
@@ -143,8 +157,12 @@ class TareasListWidget extends StatelessWidget {
                                   margin: const EdgeInsets.only(right: 10),
                                   decoration: BoxDecoration(
                                     color: data["importancia"] == "alta"
-                                        ? Colors.orange
-                                        : const Color(0xFF6EC6CA),
+                                        ? theme
+                                              .colorScheme
+                                              .tertiary // 🔥 dinámico
+                                        : theme
+                                              .colorScheme
+                                              .primary, // 🔥 dinámico
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -153,6 +171,10 @@ class TareasListWidget extends StatelessWidget {
                                   child: Text(
                                     titulo,
                                     style: TextStyle(
+                                      color: theme
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color, // 🔥 dinámico
                                       decoration: isDone
                                           ? TextDecoration.lineThrough
                                           : null,
@@ -167,19 +189,30 @@ class TareasListWidget extends StatelessWidget {
                                     ),
                                     child: Text(
                                       hora,
-                                      style: const TextStyle(
-                                        color: Colors.grey,
+                                      style: TextStyle(
+                                        color: theme
+                                            .colorScheme
+                                            .outline, // 🔥 dinámico
                                       ),
                                     ),
                                   )
                                 else
-                                  const Icon(Icons.access_time, size: 18),
+                                  Icon(
+                                    Icons.access_time,
+                                    size: 18,
+                                    color: theme
+                                        .colorScheme
+                                        .outline, // 🔥 dinámico
+                                  ),
 
                                 // ✏️ EDITAR
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.edit_outlined,
                                     size: 18,
+                                    color: theme
+                                        .colorScheme
+                                        .primary, // 🔥 dinámico
                                   ),
                                   onPressed: () {
                                     showModalBottomSheet(
@@ -193,7 +226,9 @@ class TareasListWidget extends StatelessWidget {
                               ],
                             ),
 
-                            const Divider(),
+                            Divider(
+                              color: theme.dividerColor, // 🔥 dinámico
+                            ),
                           ],
                         );
                       },

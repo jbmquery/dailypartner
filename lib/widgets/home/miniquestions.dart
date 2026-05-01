@@ -1,3 +1,4 @@
+//lib/widgets/home/miniquestions.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -133,13 +134,17 @@ class _MiniQuestionsState extends State<MiniQuestions> {
               children: [
                 Icon(
                   isActive ? Icons.local_drink : Icons.local_drink_outlined,
-                  color: isActive ? theme.colorScheme.primary : Colors.grey,
+                  color: isActive
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.outline, // 🔥 dinámico
                   size: 40,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   "${index + 1}",
-                  style: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface, // 🔥 dinámico
+                  ),
                 ),
               ],
             ),
@@ -188,8 +193,8 @@ class _MiniQuestionsState extends State<MiniQuestions> {
                   style: TextStyle(
                     fontSize: 10,
                     color: isSelected
-                        ? theme.textTheme.bodyMedium?.color
-                        : Colors.grey,
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.outline, // 🔥 dinámico
                   ),
                 ),
               ],
@@ -207,11 +212,11 @@ class _MiniQuestionsState extends State<MiniQuestions> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.cardColor, // 🔥 dinámico
+        color: theme.colorScheme.surface, // 🔥 dinámico correcto
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: theme.colorScheme.shadow.withOpacity(0.05), // 🔥 dinámico
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -224,7 +229,7 @@ class _MiniQuestionsState extends State<MiniQuestions> {
             title,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: theme.textTheme.bodyMedium?.color,
+              color: theme.colorScheme.onSurface, // 🔥 dinámico
             ),
           ),
           const SizedBox(height: 20),
@@ -235,6 +240,8 @@ class _MiniQuestionsState extends State<MiniQuestions> {
   }
 
   Widget _productivityQuestion() {
+    final theme = Theme.of(context);
+
     return _card(
       title: "¿Qué tan productivo me siento?",
       child: Column(
@@ -256,18 +263,31 @@ class _MiniQuestionsState extends State<MiniQuestions> {
                 },
                 child: Icon(
                   active ? Icons.star : Icons.star_border,
-                  color: Colors.amber,
+                  color:
+                      theme.colorScheme.tertiary, // 🔥 dinámico (antes amber)
                   size: 60,
                 ),
               );
             }),
           ),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Quiero mi cama 😴", style: TextStyle(fontSize: 14)),
-              Text("Tamos ready 😎🤙🏻", style: TextStyle(fontSize: 14)),
+              Text(
+                "Quiero mi cama 😴",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              Text(
+                "Tamos ready 😎🤙🏻",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
             ],
           ),
         ],
@@ -276,13 +296,15 @@ class _MiniQuestionsState extends State<MiniQuestions> {
   }
 
   Widget _energyQuestion() {
+    final theme = Theme.of(context);
+
     final levels = [10, 25, 50, 75, 90, 100];
 
     Color getColor(int value) {
-      if (value <= 25) return Colors.red;
-      if (value <= 50) return Colors.orange;
-      if (value <= 75) return Colors.yellow.shade700;
-      return Colors.green;
+      if (value <= 25) return theme.colorScheme.tertiary;
+      if (value <= 50) return theme.colorScheme.secondary;
+      if (value <= 75) return theme.colorScheme.primary;
+      return theme.colorScheme.primary;
     }
 
     return _card(
@@ -309,7 +331,13 @@ class _MiniQuestionsState extends State<MiniQuestions> {
                   size: selected ? 55 : 50,
                   color: getColor(levels[index]),
                 ),
-                Text("${levels[index]}%", style: const TextStyle(fontSize: 10)),
+                Text(
+                  "${levels[index]}%",
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
               ],
             ),
           );
@@ -319,6 +347,8 @@ class _MiniQuestionsState extends State<MiniQuestions> {
   }
 
   Widget _stressQuestion() {
+    final theme = Theme.of(context);
+
     final stressLevels = [
       {"emoji": "😌", "label": "Relax"},
       {"emoji": "🙂", "label": "Leve"},
@@ -352,7 +382,10 @@ class _MiniQuestionsState extends State<MiniQuestions> {
                 ),
                 Text(
                   stressLevels[index]["label"]!,
-                  style: const TextStyle(fontSize: 10),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: theme.colorScheme.onSurface, // 🔥 dinámico
+                  ),
                 ),
               ],
             ),
@@ -393,13 +426,15 @@ class _MiniQuestionsState extends State<MiniQuestions> {
                 Icon(
                   weather[index]["icon"] as IconData,
                   size: selected ? 34 : 28,
-                  color: selected ? theme.colorScheme.primary : Colors.grey,
+                  color: selected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.outline, // 🔥 dinámico
                 ),
                 Text(
                   weather[index]["label"] as String,
                   style: TextStyle(
                     fontSize: 10,
-                    color: theme.textTheme.bodyMedium?.color,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ],

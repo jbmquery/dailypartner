@@ -1,3 +1,4 @@
+//lib/widgets/home/tareas_pendientes.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -48,11 +49,11 @@ class TareasPendientesWidget extends StatelessWidget {
             return Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: theme.cardColor, // 🔥 dinámico
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: theme.shadowColor.withOpacity(0.08), // 🔥 dinámico
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -73,12 +74,12 @@ class TareasPendientesWidget extends StatelessWidget {
                         top: Radius.circular(18),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Tareas que no hiciste",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: theme.colorScheme.onSecondary, // 🔥 dinámico
                       ),
                     ),
                   ),
@@ -119,7 +120,7 @@ Widget _taskItemFirestore(BuildContext context, DocumentSnapshot doc) {
         data["titulo"] ?? "",
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          color: theme.textTheme.bodyMedium?.color, // 🔥 dinámico
+          color: theme.colorScheme.onBackground, // 🔥 más consistente
         ),
       ),
       const SizedBox(height: 8),
@@ -175,7 +176,7 @@ Widget _miniButton(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withOpacity(0.12),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -203,7 +204,7 @@ Widget _notebookLine(BuildContext context) {
   return Container(
     width: double.infinity,
     height: 1,
-    color: theme.dividerColor.withOpacity(0.5), // 🔥 dinámico
+    color: theme.dividerColor.withOpacity(0.5),
   );
 }
 
@@ -214,13 +215,15 @@ Widget _emptyCard(BuildContext context) {
     width: double.infinity,
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      color: theme.cardColor, // 🔥 dinámico
+      color: theme.cardColor,
       borderRadius: BorderRadius.circular(18),
     ),
     child: Center(
       child: Text(
         "🎉 No tienes tareas pendientes",
-        style: TextStyle(color: theme.textTheme.bodyMedium?.color),
+        style: TextStyle(
+          color: theme.colorScheme.onBackground, // 🔥 consistente
+        ),
       ),
     ),
   );

@@ -54,7 +54,7 @@ Widget _rachaUI(BuildContext context, int streak) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.12), // 🔥 dinámico
+      color: color.withOpacity(0.12),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(

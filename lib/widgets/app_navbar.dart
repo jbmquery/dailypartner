@@ -24,7 +24,6 @@ class AppNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = AuthService();
 
-    // 🎨 COLORES DINÁMICOS DEL TEMA
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
     final onPrimary = theme.colorScheme.onPrimary;
@@ -70,7 +69,7 @@ class AppNavbar extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                color: theme.cardColor,
+                color: theme.colorScheme.surface, // 🔥 mejor que cardColor
                 onSelected: (value) async {
                   if (value == "logout") {
                     await auth.logout();
@@ -82,12 +81,18 @@ class AppNavbar extends StatelessWidget {
                     enabled: false,
                     child: Text(
                       "Hola, $nombre",
-                      style: theme.textTheme.bodyMedium,
+                      style: TextStyle(
+                        color:
+                            theme.colorScheme.onSurface, // 🔥 dinámico correcto
+                      ),
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: "logout",
-                    child: Text("Cerrar sesión"),
+                    child: Text(
+                      "Cerrar sesión",
+                      style: TextStyle(color: theme.colorScheme.onSurface),
+                    ),
                   ),
                 ],
                 child: _iconBox(

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TareasListDialog extends StatefulWidget {
-  final DocumentSnapshot? taskDoc; // 👈 ahora puede ser null
-  final DocumentReference? dailyRef; // 👈 para crear
+  final DocumentSnapshot? taskDoc;
+  final DocumentReference? dailyRef;
 
   const TareasListDialog({super.key, this.taskDoc, this.dailyRef});
 
@@ -74,6 +74,8 @@ class _TareasListDialogState extends State<TareasListDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🔥 NUEVO
+
     return AnimatedPadding(
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
@@ -82,9 +84,9 @@ class _TareasListDialogState extends State<TareasListDialog> {
       ),
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+        decoration: BoxDecoration(
+          color: theme.cardColor, // 🔥 dinámico
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -95,7 +97,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.3),
+                color: theme.dividerColor.withOpacity(0.4), // 🔥 dinámico
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -105,9 +107,10 @@ class _TareasListDialogState extends State<TareasListDialog> {
               alignment: Alignment.centerLeft,
               child: Text(
                 isEditing ? "Editar tarea" : "Nueva tarea",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: theme.textTheme.bodyMedium?.color, // 🔥 dinámico
                 ),
               ),
             ),
@@ -118,14 +121,18 @@ class _TareasListDialogState extends State<TareasListDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
+                color: theme.colorScheme.surface, // 🔥 dinámico
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(
                 controller: controller,
                 autofocus: true,
-                decoration: const InputDecoration(
+                style: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                decoration: InputDecoration(
                   hintText: "¿Qué tienes que hacer?",
+                  hintStyle: TextStyle(
+                    color: theme.colorScheme.outline, // 🔥 dinámico
+                  ),
                   border: InputBorder.none,
                 ),
               ),
@@ -133,7 +140,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
 
             const SizedBox(height: 14),
 
-            // ⏰ + ⭐ MISMA FILA
+            // ⏰ + ⭐
             Row(
               children: [
                 Expanded(
@@ -145,21 +152,23 @@ class _TareasListDialogState extends State<TareasListDialog> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6EC6CA).withOpacity(0.1),
+                        color: theme.colorScheme.primary.withOpacity(
+                          0.1,
+                        ), // 🔥 dinámico
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.access_time,
                             size: 18,
-                            color: Color(0xFF6EC6CA),
+                            color: theme.colorScheme.primary, // 🔥 dinámico
                           ),
                           const SizedBox(width: 6),
                           Text(
                             time ?? "Agregar hora",
-                            style: const TextStyle(
-                              color: Color(0xFF6EC6CA),
+                            style: TextStyle(
+                              color: theme.colorScheme.primary, // 🔥 dinámico
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -175,13 +184,19 @@ class _TareasListDialogState extends State<TareasListDialog> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
+                      color: theme.colorScheme.tertiary.withOpacity(
+                        0.1,
+                      ), // 🔥 dinámico
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: DropdownButton<String>(
                       value: importancia,
                       isExpanded: true,
                       underline: const SizedBox(),
+                      dropdownColor: theme.cardColor, // 🔥 dinámico
+                      style: TextStyle(
+                        color: theme.textTheme.bodyMedium?.color,
+                      ),
                       items: const [
                         DropdownMenuItem(
                           value: "normal",
@@ -236,14 +251,14 @@ class _TareasListDialogState extends State<TareasListDialog> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6EC6CA),
+                        color: theme.colorScheme.primary, // 🔥 dinámico
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           "Guardar",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: theme.colorScheme.onPrimary, // 🔥 dinámico
                             fontWeight: FontWeight.bold,
                           ),
                         ),

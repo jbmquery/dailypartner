@@ -12,7 +12,7 @@ class AppSidebar extends StatelessWidget {
 
     return Drawer(
       child: Container(
-        color: theme.scaffoldBackgroundColor, // 🔥 dinámico
+        color: theme.scaffoldBackgroundColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -20,7 +20,7 @@ class AppSidebar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary, // 🔥 dinámico
+                color: theme.colorScheme.primary,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),
@@ -29,12 +29,16 @@ class AppSidebar extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.dashboard, color: Colors.white, size: 40),
+                  Icon(
+                    Icons.dashboard,
+                    color: theme.colorScheme.onPrimary, // 🔥 dinámico
+                    size: 40,
+                  ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     "Daily Partner",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary, // 🔥 dinámico
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
@@ -42,7 +46,11 @@ class AppSidebar extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     "Panel principal",
-                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimary.withOpacity(
+                        0.7,
+                      ), // 🔥 dinámico
+                    ),
                   ),
                 ],
               ),
@@ -104,18 +112,21 @@ class AppSidebar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: ListTile(
-        leading: Icon(
-          icon,
-          color: theme.colorScheme.primary, // 🔥 dinámico
-        ),
+        leading: Icon(icon, color: theme.colorScheme.primary),
         title: Text(
           title,
           style: TextStyle(
-            color: theme.textTheme.bodyMedium?.color, // 🔥 dinámico
+            color: theme
+                .colorScheme
+                .onBackground, // 🔥 más correcto que bodyMedium
           ),
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         onTap: onTap,
+
+        // 🔥 efecto visual al tocar (se adapta al tema)
+        hoverColor: theme.colorScheme.primary.withOpacity(0.05),
+        splashColor: theme.colorScheme.primary.withOpacity(0.1),
       ),
     );
   }

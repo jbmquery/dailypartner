@@ -26,17 +26,21 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // 🔥 NUEVO
+    final theme = Theme.of(context);
 
     return Scaffold(
       drawer: const AppSidebar(),
-      backgroundColor: theme.scaffoldBackgroundColor, // 🔥 dinámico
+      backgroundColor: theme.scaffoldBackgroundColor,
 
       body: StreamBuilder(
         stream: DailyStatusService.stream(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary, // 🔥 dinámico
+              ),
+            );
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
@@ -69,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                               Row(
                                 children: [
                                   _actionButton(
-                                    context: context, // 🔥 NUEVO
+                                    context: context,
                                     icon: Icons.repeat,
                                     label: "Repetitivas",
                                     onTap: () {
@@ -86,10 +90,10 @@ class _HomePageState extends State<HomePage> {
                                   const SizedBox(width: 5),
 
                                   _actionButton(
-                                    context: context, // 🔥 NUEVO
+                                    context: context,
                                     icon: Icons.play_arrow,
                                     label: "Iniciamos",
-                                    enabled: botonActivo, // 🔥 NUEVO
+                                    enabled: botonActivo,
                                     onTap: botonActivo
                                         ? () {
                                             Navigator.push(
@@ -135,38 +139,35 @@ class _HomePageState extends State<HomePage> {
 }
 
 Widget _actionButton({
-  required BuildContext context, // 🔥 NUEVO
+  required BuildContext context,
   required IconData icon,
   required String label,
   VoidCallback? onTap,
-  bool enabled = true, // 🔥 NUEVO
+  bool enabled = true,
 }) {
   final theme = Theme.of(context);
 
-  final color = enabled
-      ? theme
-            .colorScheme
-            .primary // 🔥 dinámico
+  final backgroundColor = enabled
+      ? theme.colorScheme.primary
       : theme.disabledColor;
+
+  final textColor = theme.colorScheme.onPrimary; // 🔥 clave para dark/light
 
   return GestureDetector(
     onTap: onTap,
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
-        color: color,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: Colors.white),
+          Icon(icon, size: 18, color: textColor),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
           ),
         ],
       ),
