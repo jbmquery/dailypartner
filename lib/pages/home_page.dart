@@ -8,8 +8,6 @@ import 'repetitivas_page.dart';
 import '../widgets/home/tareas_list.dart';
 import '../widgets/home/tareas_pendientes.dart';
 import '../services/daily_status_service.dart';
-import '../services/streak_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/home/home_racha.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,9 +26,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🔥 NUEVO
+
     return Scaffold(
       drawer: const AppSidebar(),
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: theme.scaffoldBackgroundColor, // 🔥 dinámico
 
       body: StreamBuilder(
         stream: DailyStatusService.stream(),
@@ -69,14 +69,9 @@ class _HomePageState extends State<HomePage> {
                               Row(
                                 children: [
                                   _actionButton(
+                                    context: context, // 🔥 NUEVO
                                     icon: Icons.repeat,
                                     label: "Repetitivas",
-                                    color: const Color.fromRGBO(
-                                      215,
-                                      150,
-                                      192,
-                                      1,
-                                    ),
                                     onTap: () {
                                       Navigator.push(
                                         context,
@@ -91,11 +86,10 @@ class _HomePageState extends State<HomePage> {
                                   const SizedBox(width: 5),
 
                                   _actionButton(
+                                    context: context, // 🔥 NUEVO
                                     icon: Icons.play_arrow,
                                     label: "Iniciamos",
-                                    color: botonActivo
-                                        ? const Color.fromRGBO(245, 134, 169, 1)
-                                        : Colors.grey,
+                                    enabled: botonActivo, // 🔥 NUEVO
                                     onTap: botonActivo
                                         ? () {
                                             Navigator.push(
@@ -117,7 +111,6 @@ class _HomePageState extends State<HomePage> {
                           const MiniQuestions(),
                           const SizedBox(height: 20),
 
-                          // 👇 SOLO UNO SE MUESTRA SEGÚN ESTADO
                           if (mostrarPendientes) ...[
                             const TareasPendientesWidget(),
                             const SizedBox(height: 20),
@@ -142,11 +135,20 @@ class _HomePageState extends State<HomePage> {
 }
 
 Widget _actionButton({
+  required BuildContext context, // 🔥 NUEVO
   required IconData icon,
   required String label,
-  required Color color,
   VoidCallback? onTap,
+  bool enabled = true, // 🔥 NUEVO
 }) {
+  final theme = Theme.of(context);
+
+  final color = enabled
+      ? theme
+            .colorScheme
+            .primary // 🔥 dinámico
+      : theme.disabledColor;
+
   return GestureDetector(
     onTap: onTap,
     child: Container(

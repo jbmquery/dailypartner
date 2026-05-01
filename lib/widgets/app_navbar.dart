@@ -24,6 +24,11 @@ class AppNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = AuthService();
 
+    // 🎨 COLORES DINÁMICOS DEL TEMA
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final onPrimary = theme.colorScheme.onPrimary;
+
     return FutureBuilder(
       future: obtenerNombre(),
       builder: (context, snapshot) {
@@ -31,25 +36,31 @@ class AppNavbar extends StatelessWidget {
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: const BoxDecoration(
-            color: Color(0xFF6EC6CA), // celeste
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+          decoration: BoxDecoration(
+            color: primary,
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // ☰ botón menú
+              // ☰ menú
               Builder(
                 builder: (context) => GestureDetector(
                   onTap: () => Scaffold.of(context).openDrawer(),
-                  child: _iconBox(Icons.menu),
+                  child: _iconBox(
+                    icon: Icons.menu,
+                    bgColor: onPrimary.withOpacity(0.15),
+                    iconColor: onPrimary,
+                  ),
                 ),
               ),
 
-              const Text(
+              Text(
                 "Daily Partner",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: onPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -59,21 +70,31 @@ class AppNavbar extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
+                color: theme.cardColor,
                 onSelected: (value) async {
                   if (value == "logout") {
                     await auth.logout();
-
                     NavigationService.removeAll(context, const LoginPage());
                   }
                 },
                 itemBuilder: (context) => [
-                  PopupMenuItem(enabled: false, child: Text("Hola, $nombre")),
+                  PopupMenuItem(
+                    enabled: false,
+                    child: Text(
+                      "Hola, $nombre",
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
                   const PopupMenuItem(
                     value: "logout",
                     child: Text("Cerrar sesión"),
                   ),
                 ],
-                child: _iconBox(Icons.account_circle),
+                child: _iconBox(
+                  icon: Icons.account_circle,
+                  bgColor: onPrimary.withOpacity(0.15),
+                  iconColor: onPrimary,
+                ),
               ),
             ],
           ),
@@ -82,14 +103,18 @@ class AppNavbar extends StatelessWidget {
     );
   }
 
-  static Widget _iconBox(IconData icon) {
+  static Widget _iconBox({
+    required IconData icon,
+    required Color bgColor,
+    required Color iconColor,
+  }) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: bgColor,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Icon(icon, color: Colors.white),
+      child: Icon(icon, color: iconColor),
     );
   }
 }

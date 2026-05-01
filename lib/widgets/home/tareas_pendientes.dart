@@ -8,6 +8,8 @@ class TareasPendientesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     final user = FirebaseAuth.instance.currentUser!;
     final now = DateTime.now();
     String todayId = "${user.uid}_${now.year}-${now.month}-${now.day}";
@@ -26,7 +28,7 @@ class TareasPendientesWidget extends StatelessWidget {
         final pastDays = dailyDocs.where((doc) => doc.id != todayId).toList();
 
         if (pastDays.isEmpty) {
-          return _emptyCard();
+          return _emptyCard(context);
         }
 
         return StreamBuilder<List<DocumentSnapshot>>(
@@ -40,13 +42,13 @@ class TareasPendientesWidget extends StatelessWidget {
 
             if (pendientes.isEmpty) {
               DailyStatusService.setPendientesResueltos();
-              return _emptyCard();
+              return _emptyCard(context);
             }
 
             return Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardColor, // 🔥 dinámico
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
@@ -65,9 +67,9 @@ class TareasPendientesWidget extends StatelessWidget {
                       horizontal: 16,
                       vertical: 10,
                     ),
-                    decoration: const BoxDecoration(
-                      color: Color.fromRGBO(244, 151, 149, 1),
-                      borderRadius: BorderRadius.vertical(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.secondary, // 🔥 dinámico
+                      borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
                     ),
@@ -87,9 +89,9 @@ class TareasPendientesWidget extends StatelessWidget {
                       children: pendientes.map((doc) {
                         return Column(
                           children: [
-                            _taskItemFirestore(doc),
+                            _taskItemFirestore(context, doc),
                             const SizedBox(height: 10),
-                            _notebookLine(),
+                            _notebookLine(context),
                             const SizedBox(height: 10),
                           ],
                         );
@@ -106,7 +108,8 @@ class TareasPendientesWidget extends StatelessWidget {
   }
 }
 
-Widget _taskItemFirestore(DocumentSnapshot doc) {
+Widget _taskItemFirestore(BuildContext context, DocumentSnapshot doc) {
+  final theme = Theme.of(context);
   final data = doc.data() as Map<String, dynamic>;
 
   return Column(
@@ -114,12 +117,16 @@ Widget _taskItemFirestore(DocumentSnapshot doc) {
     children: [
       Text(
         data["titulo"] ?? "",
-        style: const TextStyle(fontWeight: FontWeight.w600),
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: theme.textTheme.bodyMedium?.color, // 🔥 dinámico
+        ),
       ),
       const SizedBox(height: 8),
       Row(
         children: [
           _miniButton(
+            context,
             Icons.check,
             "YALA",
             Colors.green,
@@ -129,6 +136,7 @@ Widget _taskItemFirestore(DocumentSnapshot doc) {
           ),
           const SizedBox(width: 6),
           _miniButton(
+            context,
             Icons.close,
             "YA FUE",
             Colors.red,
@@ -138,6 +146,7 @@ Widget _taskItemFirestore(DocumentSnapshot doc) {
           ),
           const SizedBox(width: 6),
           _miniButton(
+            context,
             Icons.refresh,
             "HOY LO HAGO",
             Colors.orange,
@@ -152,11 +161,14 @@ Widget _taskItemFirestore(DocumentSnapshot doc) {
 }
 
 Widget _miniButton(
+  BuildContext context,
   IconData? icon,
   String label,
   Color color, {
   VoidCallback? onTap,
 }) {
+  final theme = Theme.of(context);
+
   return Expanded(
     child: GestureDetector(
       onTap: onTap,
@@ -185,23 +197,32 @@ Widget _miniButton(
   );
 }
 
-Widget _notebookLine() {
+Widget _notebookLine(BuildContext context) {
+  final theme = Theme.of(context);
+
   return Container(
     width: double.infinity,
     height: 1,
-    color: Colors.grey.withOpacity(0.5),
+    color: theme.dividerColor.withOpacity(0.5), // 🔥 dinámico
   );
 }
 
-Widget _emptyCard() {
+Widget _emptyCard(BuildContext context) {
+  final theme = Theme.of(context);
+
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: theme.cardColor, // 🔥 dinámico
       borderRadius: BorderRadius.circular(18),
     ),
-    child: const Center(child: Text("🎉 No tienes tareas pendientes")),
+    child: Center(
+      child: Text(
+        "🎉 No tienes tareas pendientes",
+        style: TextStyle(color: theme.textTheme.bodyMedium?.color),
+      ),
+    ),
   );
 }
 

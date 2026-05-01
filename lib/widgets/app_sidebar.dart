@@ -1,7 +1,6 @@
 //lib/widgets/app_sidebar.dart
 import 'package:daily_partner/pages/home_page.dart';
 import 'package:flutter/material.dart';
-import '../services/navigation_service.dart';
 import 'package:daily_partner/pages/tema_page.dart';
 
 class AppSidebar extends StatelessWidget {
@@ -9,28 +8,30 @@ class AppSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Drawer(
       child: Container(
-        color: const Color(0xFFF7F7F7),
+        color: theme.scaffoldBackgroundColor, // 🔥 dinámico
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             // HEADER
             Container(
               padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
-              decoration: const BoxDecoration(
-                color: Color(0xFF6EC6CA),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary, // 🔥 dinámico
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),
                 ),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.dashboard, color: Colors.white, size: 40),
-                  SizedBox(height: 10),
-                  Text(
+                  const Icon(Icons.dashboard, color: Colors.white, size: 40),
+                  const SizedBox(height: 10),
+                  const Text(
                     "Daily Partner",
                     style: TextStyle(
                       color: Colors.white,
@@ -38,10 +39,10 @@ class AppSidebar extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     "Panel principal",
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
                   ),
                 ],
               ),
@@ -65,18 +66,14 @@ class AppSidebar extends StatelessWidget {
               context,
               icon: Icons.history,
               title: "Historial",
-              onTap: () {
-                // luego conectas
-              },
+              onTap: () {},
             ),
 
             _menuItem(
               context,
               icon: Icons.bar_chart,
               title: "Estadísticas",
-              onTap: () {
-                // luego conectas
-              },
+              onTap: () {},
             ),
 
             _menuItem(
@@ -102,11 +99,21 @@ class AppSidebar extends StatelessWidget {
     required String title,
     VoidCallback? onTap,
   }) {
+    final theme = Theme.of(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: ListTile(
-        leading: Icon(icon, color: const Color(0xFF6EC6CA)),
-        title: Text(title),
+        leading: Icon(
+          icon,
+          color: theme.colorScheme.primary, // 🔥 dinámico
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: theme.textTheme.bodyMedium?.color, // 🔥 dinámico
+          ),
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         onTap: onTap,
       ),

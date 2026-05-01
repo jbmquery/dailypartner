@@ -13,7 +13,6 @@ class MiniQuestions extends StatefulWidget {
 class _MiniQuestionsState extends State<MiniQuestions> {
   final PageController _controller = PageController();
 
-  // estados
   int currentPage = 0;
   int waterSelected = 0;
   int moodSelected = -1;
@@ -22,7 +21,6 @@ class _MiniQuestionsState extends State<MiniQuestions> {
   int stressSelected = -1;
   int weatherSelected = -1;
 
-  // 🔥 OBTENER O CREAR DAILY
   Future<DocumentReference> getOrCreateDaily() async {
     final user = FirebaseAuth.instance.currentUser!;
     final now = DateTime.now();
@@ -43,7 +41,6 @@ class _MiniQuestionsState extends State<MiniQuestions> {
     return ref;
   }
 
-  // 💾 GUARDAR MINI RESPUESTAS
   Future<void> saveMiniQuestions() async {
     final dailyRef = await getOrCreateDaily();
 
@@ -54,13 +51,11 @@ class _MiniQuestionsState extends State<MiniQuestions> {
       "energia": energySelected,
       "estres": stressSelected,
       "tiempo": weatherSelected,
-    }, SetOptions(merge: true)); // 🔥 IMPORTANTE: no sobreescribe todo
+    }, SetOptions(merge: true));
   }
 
-  // 📥 CARGAR DATOS
   Future<void> loadMiniQuestions() async {
     final dailyRef = await getOrCreateDaily();
-
     final doc = await dailyRef.collection('minipreguntas').doc('resumen').get();
 
     if (doc.exists) {
@@ -79,7 +74,6 @@ class _MiniQuestionsState extends State<MiniQuestions> {
 
   void nextPage() {
     if (currentPage < 5) {
-      // 👈 ahora tienes 6 preguntas (0–5)
       currentPage++;
       _controller.animateToPage(
         currentPage,
@@ -92,7 +86,7 @@ class _MiniQuestionsState extends State<MiniQuestions> {
   @override
   void initState() {
     super.initState();
-    loadMiniQuestions(); // 🔥 carga lo guardado
+    loadMiniQuestions();
   }
 
   @override
@@ -114,8 +108,9 @@ class _MiniQuestionsState extends State<MiniQuestions> {
     );
   }
 
-  // 💧 PREGUNTA AGUA
   Widget _waterQuestion() {
+    final theme = Theme.of(context);
+
     return _card(
       title: "¿Cuántos vasos de agua vas tomado?",
       child: Row(
@@ -138,11 +133,14 @@ class _MiniQuestionsState extends State<MiniQuestions> {
               children: [
                 Icon(
                   isActive ? Icons.local_drink : Icons.local_drink_outlined,
-                  color: isActive ? Colors.blue : Colors.grey,
+                  color: isActive ? theme.colorScheme.primary : Colors.grey,
                   size: 40,
                 ),
                 const SizedBox(height: 4),
-                Text("${index + 1}"),
+                Text(
+                  "${index + 1}",
+                  style: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                ),
               ],
             ),
           );
@@ -151,8 +149,9 @@ class _MiniQuestionsState extends State<MiniQuestions> {
     );
   }
 
-  // 😊 PREGUNTA ESTADO DE ÁNIMO
   Widget _moodQuestion() {
+    final theme = Theme.of(context);
+
     final moods = [
       {"icon": "😄", "label": "Muy feliz"},
       {"icon": "🙂", "label": "Feliz"},
@@ -188,7 +187,9 @@ class _MiniQuestionsState extends State<MiniQuestions> {
                   moods[index]["label"] as String,
                   style: TextStyle(
                     fontSize: 10,
-                    color: isSelected ? Colors.black : Colors.grey,
+                    color: isSelected
+                        ? theme.textTheme.bodyMedium?.color
+                        : Colors.grey,
                   ),
                 ),
               ],
@@ -199,13 +200,14 @@ class _MiniQuestionsState extends State<MiniQuestions> {
     );
   }
 
-  // 🎀 CARD BASE (estilo planner)
   Widget _card({required String title, required Widget child}) {
+    final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor, // 🔥 dinámico
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -218,7 +220,13 @@ class _MiniQuestionsState extends State<MiniQuestions> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: theme.textTheme.bodyMedium?.color,
+            ),
+          ),
           const SizedBox(height: 20),
           child,
         ],
@@ -254,9 +262,7 @@ class _MiniQuestionsState extends State<MiniQuestions> {
               );
             }),
           ),
-
           const SizedBox(height: 8),
-
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -357,6 +363,8 @@ class _MiniQuestionsState extends State<MiniQuestions> {
   }
 
   Widget _weatherQuestion() {
+    final theme = Theme.of(context);
+
     final weather = [
       {"icon": Icons.wb_sunny, "label": "Soleado"},
       {"icon": Icons.cloud, "label": "Nublado"},
@@ -385,11 +393,14 @@ class _MiniQuestionsState extends State<MiniQuestions> {
                 Icon(
                   weather[index]["icon"] as IconData,
                   size: selected ? 34 : 28,
-                  color: selected ? Colors.blue : Colors.grey,
+                  color: selected ? theme.colorScheme.primary : Colors.grey,
                 ),
                 Text(
                   weather[index]["label"] as String,
-                  style: const TextStyle(fontSize: 10),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: theme.textTheme.bodyMedium?.color,
+                  ),
                 ),
               ],
             ),

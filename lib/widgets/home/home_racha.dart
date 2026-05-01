@@ -1,3 +1,4 @@
+//lib/widgets/home/home_racha.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/streak_service.dart';
@@ -11,33 +12,38 @@ class HomeRacha extends StatelessWidget {
       stream: StreakService.stream(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || !snapshot.data!.exists) {
-          return _rachaUI(0);
+          return _rachaUI(context, 0);
         }
 
         final data = snapshot.data!.data() as Map<String, dynamic>;
         final streak = data["currentStreak"] ?? 0;
 
-        return _rachaUI(streak);
+        return _rachaUI(context, streak);
       },
     );
   }
 }
 
 // 🎨 UI DE LA RACHA
-Widget _rachaUI(int streak) {
-  Color color;
+Widget _rachaUI(BuildContext context, int streak) {
+  final theme = Theme.of(context);
+
+  Color baseColor;
 
   if (streak <= 10) {
-    color = Colors.orange;
+    baseColor = Colors.orange;
   } else if (streak <= 30) {
-    color = Colors.blue;
+    baseColor = Colors.blue;
   } else if (streak <= 100) {
-    color = Colors.green;
+    baseColor = Colors.green;
   } else if (streak <= 365) {
-    color = Colors.purple;
+    baseColor = Colors.purple;
   } else {
-    color = Colors.amber;
+    baseColor = Colors.amber;
   }
+
+  // 🔥 mezcla con el tema
+  final color = Color.lerp(theme.colorScheme.primary, baseColor, 0.6)!;
 
   double size = 18;
   if (streak > 10) size = 22;
@@ -48,7 +54,7 @@ Widget _rachaUI(int streak) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.1),
+      color: color.withOpacity(0.12), // 🔥 dinámico
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(

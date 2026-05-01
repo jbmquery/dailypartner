@@ -13,17 +13,19 @@ class HomeCalendarBar extends StatelessWidget {
     final diaSemana = DateFormat('EEEE', 'es').format(now);
     final fecha = DateFormat('d \'de\' MMMM yyyy', 'es').format(now);
 
-    // Capitalizar primera letra
     final diaCapitalizado = diaSemana[0].toUpperCase() + diaSemana.substring(1);
 
     return "$diaCapitalizado\n$fecha";
   }
 
   void openCalendar(BuildContext context) {
+    final theme = Theme.of(context);
+
     showDialog(
       context: context,
       builder: (_) {
         return Dialog(
+          backgroundColor: theme.cardColor, // 🔥 dinámico
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
@@ -45,12 +47,14 @@ class HomeCalendarBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF6EC6CA),
+        color: theme.colorScheme.primary, // 🔥 dinámico
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -78,7 +82,7 @@ class HomeCalendarBar extends StatelessWidget {
           Expanded(
             child: Text(
               getTodayText(),
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 13,
                 height: 1.2,
@@ -93,13 +97,13 @@ class HomeCalendarBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardColor, // 🔥 dinámico
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
+              child: Text(
                 "Siguiente",
                 style: TextStyle(
-                  color: Color(0xFF6EC6CA),
+                  color: theme.colorScheme.primary, // 🔥 dinámico
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),
