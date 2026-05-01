@@ -30,6 +30,7 @@ class AuthService {
           'correo': email,
           'estado': true,
           'fecha_creacion': FieldValue.serverTimestamp(),
+          'tema': 'chill',
         });
 
         final newDoc = await ref.get();

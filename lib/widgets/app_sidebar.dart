@@ -1,6 +1,8 @@
 //lib/widgets/app_sidebar.dart
+import 'package:daily_partner/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import '../services/navigation_service.dart';
+import 'package:daily_partner/pages/tema_page.dart';
 
 class AppSidebar extends StatelessWidget {
   const AppSidebar({super.key});
@@ -49,6 +51,18 @@ class AppSidebar extends StatelessWidget {
 
             _menuItem(
               context,
+              icon: Icons.home_outlined,
+              title: "Inicio",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HomePage()),
+                );
+              },
+            ),
+
+            _menuItem(
+              context,
               icon: Icons.history,
               title: "Historial",
               onTap: () {
@@ -62,6 +76,18 @@ class AppSidebar extends StatelessWidget {
               title: "Estadísticas",
               onTap: () {
                 // luego conectas
+              },
+            ),
+
+            _menuItem(
+              context,
+              icon: Icons.mode_night_outlined,
+              title: "Temas",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TemaPage()),
+                );
               },
             ),
           ],
