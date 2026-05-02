@@ -76,7 +76,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
               padding: const EdgeInsets.only(bottom: 10),
               child: FloatingActionButton(
                 onPressed: () => openDialog(),
-                backgroundColor: theme.colorScheme.primary,
+                backgroundColor: theme.colorScheme.secondary,
                 foregroundColor: theme.colorScheme.onPrimary,
                 child: const Icon(Icons.add),
               ),
@@ -125,7 +125,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                               vertical: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.tertiary,
+                              color: theme.colorScheme.secondary,
                               borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(18),
                               ),
@@ -135,7 +135,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onTertiary,
+                                color: theme.colorScheme.onSecondary,
                               ),
                             ),
                           ),
@@ -177,7 +177,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                               ),
                                               decoration: BoxDecoration(
                                                 color:
-                                                    theme.colorScheme.tertiary,
+                                                    theme.colorScheme.secondary,
                                                 shape: BoxShape.circle,
                                               ),
                                             ),

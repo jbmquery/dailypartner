@@ -70,7 +70,7 @@ class TareasInconclusasWidget extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.tertiary, // 🔥 dinámico
+                      color: theme.colorScheme.error, // 🔥 dinámico
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
@@ -124,7 +124,7 @@ class TareasInconclusasWidget extends StatelessWidget {
                                       decoration: BoxDecoration(
                                         color: theme
                                             .colorScheme
-                                            .tertiary, // 🔥 dinámico
+                                            .error, // 🔥 dinámico
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -169,11 +169,7 @@ class TareasInconclusasWidget extends StatelessWidget {
                                 ),
 
                                 const SizedBox(height: 10),
-                                Divider(
-                                  color: theme.colorScheme.outline.withOpacity(
-                                    0.4,
-                                  ), // 🔥 dinámico
-                                ),
+                                Divider(color: theme.dividerColor),
                                 const SizedBox(height: 10),
                               ],
                             );

@@ -112,7 +112,7 @@ class AppSidebar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: ListTile(
-        leading: Icon(icon, color: theme.colorScheme.primary),
+        leading: Icon(icon, color: theme.primaryColor),
         title: Text(
           title,
           style: TextStyle(

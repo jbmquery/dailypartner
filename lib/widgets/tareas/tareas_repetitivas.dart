@@ -75,7 +75,7 @@ class TareasRepetitivasWidget extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.tertiary, // 🔥 dinámico
+                      color: theme.colorScheme.secondary, // 🔥 dinámico
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
@@ -137,7 +137,7 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                                   .outline // 🔥 dinámico
                                             : theme
                                                   .colorScheme
-                                                  .tertiary, // 🔥 dinámico
+                                                  .secondary, // 🔥 dinámico
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -195,7 +195,7 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                         size: 18,
                                         color: theme
                                             .colorScheme
-                                            .outline, // 🔥 dinámico
+                                            .error, // 🔥 dinámico
                                       ),
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
@@ -228,12 +228,7 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                 ),
 
                                 const SizedBox(height: 8),
-                                Divider(
-                                  height: 1,
-                                  color: theme.colorScheme.outline.withOpacity(
-                                    0.4,
-                                  ), // 🔥 dinámico
-                                ),
+                                Divider(height: 1, color: theme.dividerColor),
                                 const SizedBox(height: 8),
                               ],
                             );
