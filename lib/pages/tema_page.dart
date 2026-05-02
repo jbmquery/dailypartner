@@ -45,12 +45,14 @@ class _TemaPageState extends State<TemaPage> {
   }
 
   Widget modoCard({
+    required BuildContext context,
     required String title,
     required String subtitle,
     required String value,
     required Color color,
     required IconData icon,
   }) {
+    final theme = Theme.of(context);
     final selected = modo == value;
 
     return GestureDetector(
@@ -60,10 +62,12 @@ class _TemaPageState extends State<TemaPage> {
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: selected ? color : Colors.white,
+          color: selected ? color : theme.colorScheme.surface, // 🔥 dinámico
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: selected ? color : Colors.grey.shade300,
+            color: selected
+                ? color
+                : theme.colorScheme.outline.withOpacity(0.3), // 🔥 dinámico
             width: 2,
           ),
           boxShadow: [
@@ -77,7 +81,11 @@ class _TemaPageState extends State<TemaPage> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? Colors.white : color, size: 30),
+            Icon(
+              icon,
+              color: selected ? theme.colorScheme.onPrimary : color,
+              size: 30,
+            ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -86,7 +94,9 @@ class _TemaPageState extends State<TemaPage> {
                   Text(
                     title,
                     style: TextStyle(
-                      color: selected ? Colors.white : Colors.black,
+                      color: selected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -95,14 +105,14 @@ class _TemaPageState extends State<TemaPage> {
                     subtitle,
                     style: TextStyle(
                       color: selected
-                          ? Colors.white.withOpacity(0.8)
-                          : Colors.grey,
+                          ? theme.colorScheme.onPrimary.withOpacity(0.8)
+                          : theme.colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],
               ),
             ),
-            if (selected) const Icon(Icons.check, color: Colors.white),
+            if (selected) Icon(Icons.check, color: theme.colorScheme.onPrimary),
           ],
         ),
       ),
@@ -111,9 +121,11 @@ class _TemaPageState extends State<TemaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       drawer: const AppSidebar(),
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: theme.scaffoldBackgroundColor, // 🔥 dinámico
       body: SafeArea(
         child: Column(
           children: [
@@ -127,18 +139,20 @@ class _TemaPageState extends State<TemaPage> {
                     const SizedBox(height: 10),
 
                     modoCard(
+                      context: context,
                       title: "Modo Chill 🌿",
                       subtitle: "Relajado, claro, suave",
                       value: "chill",
-                      color: const Color(0xFF6EC6CA),
+                      color: theme.colorScheme.primary, // 🔥 dinámico
                       icon: Icons.wb_sunny,
                     ),
 
                     modoCard(
+                      context: context,
                       title: "Modo Agresivo 🔥",
                       subtitle: "Oscuro, intenso, enfocado",
                       value: "agresivo",
-                      color: Colors.deepPurple,
+                      color: theme.colorScheme.secondary, // 🔥 dinámico
                       icon: Icons.nightlight_round,
                     ),
                   ],

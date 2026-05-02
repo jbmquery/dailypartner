@@ -35,7 +35,6 @@ class _ResumenPageState extends State<ResumenPage> {
       return {...t, "source": "temp", "checked": false};
     }).toList();
 
-    // 🧠 SKIP DE HOY
     final today = DateTime.now().toString().substring(0, 10);
 
     final skipSnapshot = await FirebaseFirestore.instance
@@ -52,7 +51,6 @@ class _ResumenPageState extends State<ResumenPage> {
       return "$titulo|$hora";
     }).toSet();
 
-    // 🔁 REPETITIVAS
     final repetitivasSnapshot = await FirebaseFirestore.instance
         .collection('tareas_repetitivas')
         .where("uid", isEqualTo: user.uid)
@@ -68,10 +66,7 @@ class _ResumenPageState extends State<ResumenPage> {
           final key =
               "${titulo.toString().trim().toLowerCase()}|${(hora ?? "").toString().trim().toLowerCase()}";
 
-          // 🚫 si está en skip → no entra
-          if (skipKeys.contains(key)) {
-            return null;
-          }
+          if (skipKeys.contains(key)) return null;
 
           return {
             "titulo": titulo,
@@ -83,7 +78,6 @@ class _ResumenPageState extends State<ResumenPage> {
         .whereType<Map<String, dynamic>>()
         .toList();
 
-    // 📅 DAILY (HOY)
     final dailyRef = FirebaseFirestore.instance
         .collection('daily')
         .doc(todayId);
@@ -113,20 +107,22 @@ class _ResumenPageState extends State<ResumenPage> {
   }
 
   Color getColor(String source) {
+    final theme = Theme.of(context);
+
     switch (source) {
       case "daily":
-        return const Color.fromRGBO(244, 151, 149, 1);
+        return theme.colorScheme.secondary;
       case "repetitiva":
-        return const Color.fromRGBO(215, 150, 192, 1);
+        return theme.colorScheme.tertiary;
       case "temp":
-        return const Color.fromRGBO(245, 134, 169, 1);
+        return theme.colorScheme.primary;
       default:
-        return Colors.grey;
+        return theme.colorScheme.outline;
     }
   }
 
   Future<void> saveAll() async {
-    if (isSaving) return; // 🚫 evita doble click
+    if (isSaving) return;
 
     setState(() {
       isSaving = true;
@@ -178,9 +174,11 @@ class _ResumenPageState extends State<ResumenPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       drawer: const AppSidebar(),
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: theme.scaffoldBackgroundColor,
 
       body: SafeArea(
         child: Column(
@@ -204,13 +202,12 @@ class _ResumenPageState extends State<ResumenPage> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6EC6CA),
+                          color: theme.colorScheme.primary,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // 🔙 ATRÁS
                             GestureDetector(
                               onTap: () {
                                 Navigator.pop(context);
@@ -221,13 +218,14 @@ class _ResumenPageState extends State<ResumenPage> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: theme.colorScheme.onPrimary
+                                      .withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   "Atrás",
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: theme.colorScheme.onPrimary,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
                                   ),
@@ -235,7 +233,6 @@ class _ResumenPageState extends State<ResumenPage> {
                               ),
                             ),
 
-                            // 💾 GUARDAR
                             GestureDetector(
                               onTap: isSaving ? null : saveAll,
                               child: Container(
@@ -244,22 +241,22 @@ class _ResumenPageState extends State<ResumenPage> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: theme.colorScheme.onPrimary,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: isSaving
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         width: 16,
                                         height: 16,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: Color(0xFF6EC6CA),
+                                          color: theme.colorScheme.primary,
                                         ),
                                       )
-                                    : const Text(
+                                    : Text(
                                         "Guardar",
                                         style: TextStyle(
-                                          color: Color(0xFF6EC6CA),
+                                          color: theme.colorScheme.primary,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
                                         ),
@@ -274,11 +271,11 @@ class _ResumenPageState extends State<ResumenPage> {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: theme.colorScheme.surface,
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: theme.shadowColor.withOpacity(0.03),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -295,33 +292,32 @@ class _ResumenPageState extends State<ResumenPage> {
                                 horizontal: 16,
                                 vertical: 10,
                               ),
-                              decoration: const BoxDecoration(
-                                color: Color.fromRGBO(61, 170, 216, 1),
-                                borderRadius: BorderRadius.vertical(
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.secondary,
+                                borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(18),
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 "Las prioridades del día son:",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: theme.colorScheme.onSecondary,
                                 ),
                               ),
                             ),
 
-                            // LISTA
                             allTasks.isEmpty
                                 ? Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(20),
-                                    child: const Center(
+                                    child: Center(
                                       child: Text(
                                         "No hay tareas para hoy 💤\nAgrega algunas antes de continuar",
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: Colors.grey,
+                                          color: theme.colorScheme.outline,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -340,17 +336,10 @@ class _ResumenPageState extends State<ResumenPage> {
                                         children: [
                                           Row(
                                             children: [
-                                              // ✅ CHECKBOX
                                               Checkbox(
                                                 value: t["checked"],
                                                 activeColor:
-                                                    const Color.fromRGBO(
-                                                      61,
-                                                      170,
-                                                      216,
-                                                      1,
-                                                    ),
-
+                                                    theme.colorScheme.secondary,
                                                 onChanged: (val) {
                                                   setState(() {
                                                     t["checked"] = val;
@@ -358,7 +347,6 @@ class _ResumenPageState extends State<ResumenPage> {
                                                 },
                                               ),
 
-                                              // 🔴 PUNTO SEGÚN ORIGEN
                                               Container(
                                                 width: 10,
                                                 height: 10,
@@ -374,8 +362,11 @@ class _ResumenPageState extends State<ResumenPage> {
                                               Expanded(
                                                 child: Text(
                                                   t["titulo"] ?? "",
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 14,
+                                                    color: theme
+                                                        .colorScheme
+                                                        .onSurface,
                                                   ),
                                                 ),
                                               ),
@@ -388,23 +379,29 @@ class _ResumenPageState extends State<ResumenPage> {
                                                       ),
                                                   child: Text(
                                                     t["hora"],
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 12,
-                                                      color: Colors.grey,
+                                                      color: theme
+                                                          .colorScheme
+                                                          .outline,
                                                     ),
                                                   ),
                                                 )
                                               else
-                                                const Icon(
+                                                Icon(
                                                   Icons.access_time,
                                                   size: 18,
-                                                  color: Colors.grey,
+                                                  color:
+                                                      theme.colorScheme.outline,
                                                 ),
                                             ],
                                           ),
 
                                           const SizedBox(height: 8),
-                                          const Divider(height: 1),
+                                          Divider(
+                                            height: 1,
+                                            color: theme.dividerColor,
+                                          ),
                                           const SizedBox(height: 8),
                                         ],
                                       );

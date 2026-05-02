@@ -19,112 +19,130 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7), // fondo suave
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
+    return Theme(
+      // 🛡️ THEME AISLADO (NO LE AFECTA chill/agresivo)
+      data: ThemeData(
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(0xFFF7F7F7),
+        primaryColor: const Color(0xFF6EC6CA),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF6EC6CA),
+          secondary: Color(0xFFF8A5C2),
+          surface: Colors.white,
+          background: Color(0xFFF7F7F7),
+          onPrimary: Colors.white,
+          onSurface: Colors.black,
+          onBackground: Colors.black,
+        ),
+      ),
 
-              // Título estilo planner
-              const Text(
-                "Bienvenido Compa",
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF6EC6CA), // celeste pastel
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF7F7F7), // 🔒 fijo
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 40),
+
+                // Título estilo planner
+                const Text(
+                  "Bienvenido Compa",
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF6EC6CA),
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-              const Text(
-                "Inicia sesión para continuar",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
+                const Text(
+                  "Inicia sesión para continuar",
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
 
-              const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-              // EMAIL
-              _buildLabel("Email"),
-              const SizedBox(height: 8),
-              _buildInputField(
-                controller: emailController,
-                hint: "correo@email.com",
-                icon: Icons.email_outlined,
-              ),
+                // EMAIL
+                _buildLabel("Email"),
+                const SizedBox(height: 8),
+                _buildInputField(
+                  controller: emailController,
+                  hint: "correo@email.com",
+                  icon: Icons.email_outlined,
+                ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // PASSWORD
-              _buildLabel("Password"),
-              const SizedBox(height: 8),
-              _buildPasswordField(),
+                // PASSWORD
+                _buildLabel("Password"),
+                const SizedBox(height: 8),
+                _buildPasswordField(),
 
-              const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-              // BOTÓN LOGIN
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    String email = emailController.text;
-                    String password = passwordController.text;
+                // BOTÓN LOGIN
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      String email = emailController.text;
+                      String password = passwordController.text;
 
-                    final auth = AuthService();
+                      final auth = AuthService();
 
-                    final userData = await auth.login(
-                      email: email,
-                      password: password,
-                    );
-
-                    // 👇 AQUÍ MISMO (ya lo tienes)
-                    if (userData == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Error al iniciar sesión"),
-                        ),
+                      final userData = await auth.login(
+                        email: email,
+                        password: password,
                       );
-                      return;
-                    }
 
-                    // 🔥 FORZAMOS ENTRADA (solo para test)
-                    NavigationService.removeAll(context, const HomePage());
+                      if (userData == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Error al iniciar sesión"),
+                          ),
+                        );
+                        return;
+                      }
 
-                    // 🔥 AuthWrapper hará el resto automáticamente
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF8A5C2), // rosado pastel
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      NavigationService.removeAll(context, const HomePage());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF8A5C2),
+                      foregroundColor: Colors.white, // 🔒 fijo
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    "Entrar",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // DECORACIÓN estilo planner
-              Center(
-                child: Container(
-                  width: 60,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFB8E0D2), // verde pastel
-                    borderRadius: BorderRadius.circular(10),
+                    child: const Text(
+                      "Entrar",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 20),
+
+                // DECORACIÓN estilo planner
+                Center(
+                  child: Container(
+                    width: 60,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFB8E0D2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -132,9 +150,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildLabel(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
+    return const Text(
+      "Email",
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: Color(0xFF888888),
@@ -181,8 +199,6 @@ class _LoginPageState extends State<LoginPage> {
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(vertical: 18),
-
-        // 👁️ Ojito mágico
         suffixIcon: IconButton(
           icon: Icon(
             isPasswordVisible ? Icons.visibility : Icons.visibility_off,
@@ -194,7 +210,6 @@ class _LoginPageState extends State<LoginPage> {
             });
           },
         ),
-
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
