@@ -25,7 +25,7 @@ class AppNavbar extends StatelessWidget {
     final auth = AuthService();
 
     final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
+    final primary = theme.primaryColor;
     final onPrimary = theme.colorScheme.onPrimary;
 
     return FutureBuilder(

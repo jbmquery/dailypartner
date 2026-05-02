@@ -141,7 +141,7 @@ class _TemaPageState extends State<TemaPage> {
                     modoCard(
                       context: context,
                       title: "Modo Chill 🌿",
-                      subtitle: "Relajado, claro, suave",
+                      subtitle: "Fluye con tu día. Tu paz es lo primero.",
                       value: "chill",
                       color: theme.colorScheme.primary, // 🔥 dinámico
                       icon: Icons.wb_sunny,
@@ -150,9 +150,10 @@ class _TemaPageState extends State<TemaPage> {
                     modoCard(
                       context: context,
                       title: "Modo Agresivo 🔥",
-                      subtitle: "Oscuro, intenso, enfocado",
+                      subtitle:
+                          "¿Vas a llorar o vas a cumplir? El reloj no se detiene para los flojos.",
                       value: "agresivo",
-                      color: theme.colorScheme.secondary, // 🔥 dinámico
+                      color: theme.colorScheme.primary, // 🔥 dinámico
                       icon: Icons.nightlight_round,
                     ),
                   ],

@@ -127,7 +127,7 @@ class _TareasPageState extends State<TareasPage> {
                                 ),
                                 decoration: BoxDecoration(
                                   color:
-                                      theme.colorScheme.tertiary, // 🔥 dinámico
+                                      theme.colorScheme.primary, // 🔥 dinámico
                                   borderRadius: const BorderRadius.vertical(
                                     top: Radius.circular(18),
                                   ),
@@ -184,7 +184,7 @@ class _TareasPageState extends State<TareasPage> {
                                                   decoration: BoxDecoration(
                                                     color: theme
                                                         .colorScheme
-                                                        .tertiary, // 🔥 dinámico
+                                                        .primary, // 🔥 dinámico
                                                     shape: BoxShape.circle,
                                                   ),
                                                 ),
@@ -246,8 +246,7 @@ class _TareasPageState extends State<TareasPage> {
                                             const SizedBox(height: 8),
                                             Divider(
                                               height: 1,
-                                              color: theme.colorScheme.outline
-                                                  .withOpacity(0.3),
+                                              color: theme.dividerColor,
                                             ),
                                             const SizedBox(height: 8),
                                           ],

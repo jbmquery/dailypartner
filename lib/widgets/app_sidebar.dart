@@ -20,7 +20,7 @@ class AppSidebar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
+                color: theme.primaryColor,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),

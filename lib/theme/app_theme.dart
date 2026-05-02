@@ -21,12 +21,15 @@ class AppTheme {
         // 🧱 Superficies
         surface: Colors.white, // Cards
         background: Color(0xFFF7F7F7), // Fondo general
+        error: Color(0xFFFF4D4F),
+
         // 🖊️ Texto
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onTertiary: Colors.white,
         onSurface: Colors.black,
         onBackground: Colors.black,
+        onError: Colors.white,
 
         // 🌫️ Detalles suaves (sombras/dividers)
         outline: Colors.grey,
@@ -65,18 +68,19 @@ class AppTheme {
       brightness: Brightness.dark,
 
       // 🎨 Fondo general (negro real como tu UI)
-      scaffoldBackgroundColor: const Color(0xFF0B0B0B),
+      scaffoldBackgroundColor: const Color(0xFF141414),
 
       // 🎯 Color principal (azul tipo iconos del menú)
-      primaryColor: const Color(0xFF3D7BFF),
+      primaryColor: const Color(0xFF3052F4),
 
       colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF3D7BFF), // Azul moderno (iconos)
-        secondary: Color(0xFFFF8C42), // Naranja suave (CTA tipo "Pro")
-        tertiary: Color(0xFF4CAF50), // Verde leve (badges / éxito)
+        primary: Color(0xFF5EC1A2), // Azul moderno (iconos)
+        secondary: Color(0xFFC871FF), // Naranja suave (CTA tipo "Pro")
+        tertiary: Color(0xFFFFD12E), // Verde leve (badges / éxito)
         // 🧱 Superficies (cards tipo gris oscuro elegante)
-        surface: Color(0xFF1C1C1E),
+        surface: Color(0xFF2C3034),
         background: Color(0xFF0B0B0B),
+        error: Color(0xFFFF4D4D),
 
         // 🖊️ Texto
         onPrimary: Colors.white,
@@ -84,9 +88,10 @@ class AppTheme {
         onTertiary: Colors.white,
         onSurface: Color(0xFFEAEAEA),
         onBackground: Color(0xFFEAEAEA),
+        onError: Colors.white,
 
         // 🌫️ Bordes y separadores suaves
-        outline: Color(0xFF2C2C2E),
+        outline: Color(0xFF919193),
         shadow: Colors.black,
       ),
 
@@ -107,12 +112,12 @@ class AppTheme {
 
       // 🔘 FAB (azul consistente)
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: Color(0xFF3D7BFF),
+        backgroundColor: Color(0xFF3052F4),
         foregroundColor: Colors.white,
       ),
 
       // 📏 Divider (líneas sutiles)
-      dividerColor: Color(0xFF2C2C2E),
+      dividerColor: Color(0xFF919193),
 
       // 🧊 Sombras
       shadowColor: Colors.black,

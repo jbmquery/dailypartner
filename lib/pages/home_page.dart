@@ -85,6 +85,8 @@ class _HomePageState extends State<HomePage> {
                                     context: context,
                                     icon: Icons.repeat,
                                     label: "Repetitivas",
+                                    bgColor:
+                                        theme.colorScheme.secondary, // 🔥 azul
                                     onTap: () {
                                       Navigator.push(
                                         context,
@@ -103,6 +105,8 @@ class _HomePageState extends State<HomePage> {
                                     icon: Icons.play_arrow,
                                     label: "Iniciamos",
                                     enabled: botonActivo,
+                                    bgColor:
+                                        theme.colorScheme.primary, // 🔥 azul
                                     onTap: botonActivo
                                         ? () {
                                             Navigator.push(
@@ -151,16 +155,15 @@ Widget _actionButton({
   required BuildContext context,
   required IconData icon,
   required String label,
+  required Color bgColor, // 🔥 NUEVO
   VoidCallback? onTap,
   bool enabled = true,
 }) {
   final theme = Theme.of(context);
 
-  final backgroundColor = enabled
-      ? theme.colorScheme.primary
-      : theme.disabledColor;
+  final backgroundColor = enabled ? bgColor : theme.disabledColor;
 
-  final textColor = theme.colorScheme.onPrimary; // 🔥 clave para dark/light
+  final textColor = theme.colorScheme.onPrimary;
 
   return GestureDetector(
     onTap: onTap,

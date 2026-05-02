@@ -69,7 +69,7 @@ class TareasPendientesWidget extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.secondary, // 🔥 dinámico
+                      color: theme.colorScheme.error, // 🔥 dinámico
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
@@ -173,22 +173,39 @@ Widget _miniButton(
   return Expanded(
     child: GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        padding: const EdgeInsets.symmetric(vertical: 8), // 👈 más compacto
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(10),
+          color: color,
+          borderRadius: BorderRadius.circular(12),
+
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.25), // 👈 sombra más sutil
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 18, color: color),
+            Icon(
+              icon,
+              size: 16, // 👈 más pequeño
+              color: theme.colorScheme.onPrimary,
+            ),
+
             const SizedBox(height: 4),
+
             Text(
               label,
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: color,
+                fontSize: 10.5, // 👈 más fino
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onPrimary,
               ),
             ),
           ],

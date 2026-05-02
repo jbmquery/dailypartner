@@ -49,7 +49,7 @@ class HomeCalendarBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final primary = theme.colorScheme.primary;
+    final primary = theme.primaryColor;
     final onPrimary = theme.colorScheme.onPrimary;
 
     return Container(
@@ -100,7 +100,7 @@ class HomeCalendarBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface, // 🔥 dinámico correcto
+                color: theme.colorScheme.onPrimary, // 🔥 dinámico correcto
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
