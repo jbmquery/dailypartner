@@ -74,7 +74,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // 🔥 NUEVO
+    final theme = Theme.of(context);
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 180),
@@ -85,7 +85,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
         decoration: BoxDecoration(
-          color: theme.cardColor, // 🔥 dinámico
+          color: theme.colorScheme.surface, // 🔥 igual que repetitivas
           borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
         ),
         child: Column(
@@ -97,7 +97,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: theme.dividerColor.withOpacity(0.4), // 🔥 dinámico
+                color: theme.colorScheme.outline.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -110,7 +110,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: theme.textTheme.bodyMedium?.color, // 🔥 dinámico
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -121,17 +121,17 @@ class _TareasListDialogState extends State<TareasListDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface, // 🔥 dinámico
+                color: theme.colorScheme.background,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(
                 controller: controller,
                 autofocus: true,
-                style: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                style: TextStyle(color: theme.colorScheme.onBackground),
                 decoration: InputDecoration(
                   hintText: "¿Qué tienes que hacer?",
                   hintStyle: TextStyle(
-                    color: theme.colorScheme.outline, // 🔥 dinámico
+                    color: theme.colorScheme.onBackground.withOpacity(0.5),
                   ),
                   border: InputBorder.none,
                 ),
@@ -152,9 +152,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(
-                          0.1,
-                        ), // 🔥 dinámico
+                        color: theme.colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -162,13 +160,13 @@ class _TareasListDialogState extends State<TareasListDialog> {
                           Icon(
                             Icons.access_time,
                             size: 18,
-                            color: theme.colorScheme.primary, // 🔥 dinámico
+                            color: theme.colorScheme.primary,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             time ?? "Agregar hora",
                             style: TextStyle(
-                              color: theme.colorScheme.primary, // 🔥 dinámico
+                              color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -184,19 +182,15 @@ class _TareasListDialogState extends State<TareasListDialog> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.tertiary.withOpacity(
-                        0.1,
-                      ), // 🔥 dinámico
+                      color: theme.colorScheme.tertiary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: DropdownButton<String>(
                       value: importancia,
                       isExpanded: true,
                       underline: const SizedBox(),
-                      dropdownColor: theme.cardColor, // 🔥 dinámico
-                      style: TextStyle(
-                        color: theme.textTheme.bodyMedium?.color,
-                      ),
+                      dropdownColor: theme.colorScheme.surface,
+                      style: TextStyle(color: theme.colorScheme.onSurface),
                       items: const [
                         DropdownMenuItem(
                           value: "normal",
@@ -227,14 +221,14 @@ class _TareasListDialogState extends State<TareasListDialog> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: theme.colorScheme.error.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             "Eliminar",
                             style: TextStyle(
-                              color: Colors.red,
+                              color: theme.colorScheme.error,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -251,14 +245,14 @@ class _TareasListDialogState extends State<TareasListDialog> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary, // 🔥 dinámico
+                        color: theme.colorScheme.primary,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
                         child: Text(
                           "Guardar",
                           style: TextStyle(
-                            color: theme.colorScheme.onPrimary, // 🔥 dinámico
+                            color: theme.colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

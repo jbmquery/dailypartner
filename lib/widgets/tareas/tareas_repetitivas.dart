@@ -9,6 +9,8 @@ class TareasRepetitivasWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🔥 NUEVO
+
     final user = FirebaseAuth.instance.currentUser!;
     final today = DateTime.now().toString().substring(0, 10);
 
@@ -24,7 +26,6 @@ class TareasRepetitivasWidget extends StatelessWidget {
 
         final tareas = snapshot.data!.docs;
 
-        // 🔥 SEGUNDO STREAM (skip de hoy)
         return FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance
               .collection('tareas_repetitivas_skip')
@@ -36,7 +37,6 @@ class TareasRepetitivasWidget extends StatelessWidget {
               return const SizedBox();
             }
 
-            // 🧠 construir set de tareas "saltadas"
             final skipKeys = skipSnapshot.data!.docs.map((doc) {
               final data = doc.data() as Map<String, dynamic>;
               final titulo = (data["titulo"] ?? "")
@@ -51,11 +51,13 @@ class TareasRepetitivasWidget extends StatelessWidget {
             return Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface, // 🔥 dinámico
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: theme.colorScheme.shadow.withOpacity(
+                      0.05,
+                    ), // 🔥 dinámico
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -72,32 +74,32 @@ class TareasRepetitivasWidget extends StatelessWidget {
                       horizontal: 16,
                       vertical: 10,
                     ),
-                    decoration: const BoxDecoration(
-                      color: Color.fromRGBO(215, 150, 192, 1),
-                      borderRadius: BorderRadius.vertical(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.tertiary, // 🔥 dinámico
+                      borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Tus tareas repetitivas",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: theme.colorScheme.onTertiary, // 🔥 dinámico
                       ),
                     ),
                   ),
 
-                  // 🔥 AQUÍ ESTÁ LA MAGIA
                   tareas.isEmpty
                       ? Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               "No hay tareas repetitivas 👀",
                               style: TextStyle(
-                                color: Colors.grey,
+                                color: theme.colorScheme.onBackground
+                                    .withOpacity(0.6), // 🔥 dinámico
                                 fontSize: 14,
                               ),
                             ),
@@ -130,13 +132,12 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                       margin: const EdgeInsets.only(right: 10),
                                       decoration: BoxDecoration(
                                         color: isSkipped
-                                            ? Colors.grey
-                                            : const Color.fromRGBO(
-                                                215,
-                                                150,
-                                                192,
-                                                1,
-                                              ),
+                                            ? theme
+                                                  .colorScheme
+                                                  .outline // 🔥 dinámico
+                                            : theme
+                                                  .colorScheme
+                                                  .tertiary, // 🔥 dinámico
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -147,8 +148,12 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: isSkipped
-                                              ? Colors.grey
-                                              : Colors.black,
+                                              ? theme
+                                                    .colorScheme
+                                                    .outline // 🔥 dinámico
+                                              : theme
+                                                    .colorScheme
+                                                    .onSurface, // 🔥 dinámico
                                           decoration: isSkipped
                                               ? TextDecoration.lineThrough
                                               : TextDecoration.none,
@@ -166,7 +171,9 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                           hora,
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.grey,
+                                            color: theme
+                                                .colorScheme
+                                                .outline, // 🔥 dinámico
                                             decoration: isSkipped
                                                 ? TextDecoration.lineThrough
                                                 : TextDecoration.none,
@@ -177,14 +184,18 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                       Icon(
                                         Icons.access_time,
                                         size: 18,
-                                        color: Colors.grey,
+                                        color: theme
+                                            .colorScheme
+                                            .outline, // 🔥 dinámico
                                       ),
 
                                     IconButton(
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.delete_outline,
                                         size: 18,
-                                        color: Colors.grey,
+                                        color: theme
+                                            .colorScheme
+                                            .outline, // 🔥 dinámico
                                       ),
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
@@ -217,7 +228,12 @@ class TareasRepetitivasWidget extends StatelessWidget {
                                 ),
 
                                 const SizedBox(height: 8),
-                                const Divider(height: 1),
+                                Divider(
+                                  height: 1,
+                                  color: theme.colorScheme.outline.withOpacity(
+                                    0.4,
+                                  ), // 🔥 dinámico
+                                ),
                                 const SizedBox(height: 8),
                               ],
                             );

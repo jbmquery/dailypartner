@@ -1,4 +1,4 @@
-//lib/widgets/home/miniquestions.dart
+//lib/pages/repetitivas_page.dart
 import 'package:flutter/material.dart';
 import '../widgets/app_navbar.dart';
 import '../widgets/app_sidebar.dart';
@@ -44,38 +44,41 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
 
   void openDialog({Map<String, dynamic>? task}) async {
     setState(() {
-      _showFab = false; // 👈 ocultar FAB
+      _showFab = false;
     });
 
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      useSafeArea: true, // 👈 AGREGAR AQUÍ
+      useSafeArea: true,
       builder: (_) => RepetitivasDialog(task: task),
     );
 
     setState(() {
-      _showFab = true; // 👈 mostrar FAB otra vez
+      _showFab = true;
     });
 
-    loadTasks(); // refrescar
+    loadTasks();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       drawer: const AppSidebar(),
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: false,
-      // FAB FIJO
+
       floatingActionButton: _showFab
           ? Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: FloatingActionButton(
                 onPressed: () => openDialog(),
-                backgroundColor: const Color(0xFF6EC6CA),
-                child: const Icon(Icons.add, color: Colors.white),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                child: const Icon(Icons.add),
               ),
             )
           : null,
@@ -92,7 +95,6 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
               const AppNavbar(),
               const SizedBox(height: 20),
 
-              // 🔥 SCROLL GENERAL (clave)
               Expanded(
                 child: SingleChildScrollView(
                   child: Padding(
@@ -101,11 +103,11 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
+                            color: theme.shadowColor.withOpacity(0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -122,33 +124,33 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                               horizontal: 16,
                               vertical: 10,
                             ),
-                            decoration: const BoxDecoration(
-                              color: Color.fromRGBO(215, 150, 192, 1),
-                              borderRadius: BorderRadius.vertical(
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.tertiary,
+                              borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(18),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               "Tareas repetitivas",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: theme.colorScheme.onTertiary,
                               ),
                             ),
                           ),
 
-                          // LISTA (se adapta al contenido)
-                          // LISTA (estado vacío + lista)
+                          // LISTA
                           tasks.isEmpty
                               ? Container(
                                   width: double.infinity,
                                   padding: const EdgeInsets.all(20),
-                                  child: const Center(
+                                  child: Center(
                                     child: Text(
                                       "Presiona + para agregar tarea✨",
                                       style: TextStyle(
-                                        color: Colors.grey,
+                                        color: theme.colorScheme.onBackground
+                                            .withOpacity(0.6), // 🔥 dinámico
                                         fontSize: 14,
                                       ),
                                     ),
@@ -173,13 +175,9 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                               margin: const EdgeInsets.only(
                                                 right: 10,
                                               ),
-                                              decoration: const BoxDecoration(
-                                                color: Color.fromRGBO(
-                                                  215,
-                                                  150,
-                                                  192,
-                                                  1,
-                                                ),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    theme.colorScheme.tertiary,
                                                 shape: BoxShape.circle,
                                               ),
                                             ),
@@ -188,8 +186,11 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                             Expanded(
                                               child: Text(
                                                 t["titulo"] ?? "",
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 14,
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurface,
                                                 ),
                                               ),
                                             ),
@@ -203,24 +204,29 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                                     ),
                                                 child: Text(
                                                   t["hora"],
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 12,
-                                                    color: Colors.grey,
+                                                    color: theme
+                                                        .colorScheme
+                                                        .outline,
                                                   ),
                                                 ),
                                               )
                                             else
-                                              const Icon(
+                                              Icon(
                                                 Icons.access_time,
                                                 size: 18,
-                                                color: Colors.grey,
+                                                color:
+                                                    theme.colorScheme.outline,
                                               ),
 
                                             // ✏️ EDITAR
                                             IconButton(
-                                              icon: const Icon(
+                                              icon: Icon(
                                                 Icons.edit_outlined,
                                                 size: 18,
+                                                color:
+                                                    theme.colorScheme.onSurface,
                                               ),
                                               padding: EdgeInsets.zero,
                                               constraints:
@@ -234,7 +240,10 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                         ),
 
                                         const SizedBox(height: 8),
-                                        const Divider(height: 1),
+                                        Divider(
+                                          height: 1,
+                                          color: theme.dividerColor,
+                                        ),
                                         const SizedBox(height: 8),
                                       ],
                                     );

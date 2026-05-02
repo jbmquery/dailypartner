@@ -7,6 +7,8 @@ class TareasInconclusasWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🔥 NUEVO
+
     final user = FirebaseAuth.instance.currentUser!;
     final now = DateTime.now();
 
@@ -34,7 +36,6 @@ class TareasInconclusasWidget extends StatelessWidget {
 
             final tareas = tareasSnapshot.data!.docs;
 
-            // 🧠 si el doc no existe → lista vacía
             final pendientes = !dailyDoc.exists
                 ? []
                 : tareas.where((doc) {
@@ -45,11 +46,13 @@ class TareasInconclusasWidget extends StatelessWidget {
             return Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface, // 🔥 dinámico
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: theme.colorScheme.shadow.withOpacity(
+                      0.05,
+                    ), // 🔥 dinámico
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -66,32 +69,33 @@ class TareasInconclusasWidget extends StatelessWidget {
                       horizontal: 16,
                       vertical: 10,
                     ),
-                    decoration: const BoxDecoration(
-                      color: Color.fromRGBO(244, 151, 149, 1),
-                      borderRadius: BorderRadius.vertical(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.tertiary, // 🔥 dinámico
+                      borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Tareas pendientes",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: theme.colorScheme.onTertiary, // 🔥 dinámico
                       ),
                     ),
                   ),
 
-                  // 🔥 MISMO PATRÓN QUE YA USAS
+                  // CONTENIDO
                   pendientes.isEmpty
                       ? Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               "Excelente, estamos al día 🎉",
                               style: TextStyle(
-                                color: Colors.grey,
+                                color: theme.colorScheme.onBackground
+                                    .withOpacity(0.6), // 🔥 dinámico
                                 fontSize: 14,
                               ),
                             ),
@@ -117,8 +121,10 @@ class TareasInconclusasWidget extends StatelessWidget {
                                       width: 10,
                                       height: 10,
                                       margin: const EdgeInsets.only(right: 10),
-                                      decoration: const BoxDecoration(
-                                        color: Color.fromRGBO(244, 151, 149, 1),
+                                      decoration: BoxDecoration(
+                                        color: theme
+                                            .colorScheme
+                                            .tertiary, // 🔥 dinámico
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -126,7 +132,12 @@ class TareasInconclusasWidget extends StatelessWidget {
                                     Expanded(
                                       child: Text(
                                         titulo,
-                                        style: const TextStyle(fontSize: 14),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: theme
+                                              .colorScheme
+                                              .onSurface, // 🔥 dinámico
+                                        ),
                                       ),
                                     ),
 
@@ -138,23 +149,31 @@ class TareasInconclusasWidget extends StatelessWidget {
                                         ),
                                         child: Text(
                                           hora,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.grey,
+                                            color: theme
+                                                .colorScheme
+                                                .outline, // 🔥 dinámico
                                           ),
                                         ),
                                       )
                                     else
-                                      const Icon(
+                                      Icon(
                                         Icons.access_time,
                                         size: 18,
-                                        color: Colors.grey,
+                                        color: theme
+                                            .colorScheme
+                                            .outline, // 🔥 dinámico
                                       ),
                                   ],
                                 ),
 
                                 const SizedBox(height: 10),
-                                const Divider(),
+                                Divider(
+                                  color: theme.colorScheme.outline.withOpacity(
+                                    0.4,
+                                  ), // 🔥 dinámico
+                                ),
                                 const SizedBox(height: 10),
                               ],
                             );

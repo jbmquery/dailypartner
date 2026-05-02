@@ -43,7 +43,16 @@ class _HomePageState extends State<HomePage> {
             );
           }
 
-          final data = snapshot.data!.data() as Map<String, dynamic>;
+          final doc = snapshot.data!;
+          final data = doc.data() as Map<String, dynamic>?;
+
+          if (data == null) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary,
+              ),
+            );
+          }
 
           final pendientesResueltos = data["pendientesResueltos"] ?? false;
           final resumenCompletado = data["resumenCompletado"] ?? false;

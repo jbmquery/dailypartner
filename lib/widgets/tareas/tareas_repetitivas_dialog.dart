@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 Future<String?> showEliminarRepetitivaDialog(BuildContext context) {
+  final theme = Theme.of(context); // 🔥 clave
+
   return showDialog<String>(
     context: context,
     barrierDismissible: true,
@@ -10,11 +12,11 @@ Future<String?> showEliminarRepetitivaDialog(BuildContext context) {
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.colorScheme.surface, // 🔥 dinámico
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: theme.shadowColor.withOpacity(0.05),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -23,30 +25,37 @@ Future<String?> showEliminarRepetitivaDialog(BuildContext context) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 🔘 HANDLE (consistencia con tus modals)
+              // 🔘 HANDLE
               Container(
                 width: 40,
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
 
               // 🧠 TITULO
-              const Text(
+              Text(
                 "¿Eliminar esta tarea?",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface, // 🔥 dinámico
+                ),
               ),
 
               const SizedBox(height: 8),
 
-              // ✍️ SUBTEXTO (detalle fino UX)
-              const Text(
+              // ✍️ SUBTEXTO
+              Text(
                 "Puedes quitarla solo por hoy o eliminarla para siempre",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                ),
               ),
 
               const SizedBox(height: 20),
@@ -63,14 +72,14 @@ Future<String?> showEliminarRepetitivaDialog(BuildContext context) {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6EC6CA).withOpacity(0.1),
+                          color: theme.colorScheme.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             "Solo por hoy",
                             style: TextStyle(
-                              color: Color(0xFF6EC6CA),
+                              color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -90,14 +99,14 @@ Future<String?> showEliminarRepetitivaDialog(BuildContext context) {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: theme.colorScheme.error.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             "Para siempre",
                             style: TextStyle(
-                              color: Colors.red,
+                              color: theme.colorScheme.error,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

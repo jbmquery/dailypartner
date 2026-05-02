@@ -11,6 +11,7 @@ import 'pages/home_page.dart';
 // 🔥 NUEVO
 import 'services/theme_service.dart';
 import 'theme/app_theme.dart';
+import 'services/daily_status_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,8 +50,25 @@ class MiApp extends StatelessWidget {
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+
+    // 🔥 ESCUCHAMOS CAMBIOS DE USUARIO
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user != null) {
+        DailyStatusService.initDay();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

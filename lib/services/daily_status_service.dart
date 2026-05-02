@@ -2,17 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class DailyStatusService {
-  static final user = FirebaseAuth.instance.currentUser!;
-
   static String get todayId {
+    final user = FirebaseAuth.instance.currentUser!;
     final now = DateTime.now();
     return "${user.uid}_${now.year}-${now.month}-${now.day}";
   }
 
-  static DocumentReference get ref =>
-      FirebaseFirestore.instance.collection('daily_status').doc(todayId);
+  static DocumentReference get ref {
+    return FirebaseFirestore.instance.collection('daily_status').doc(todayId);
+  }
 
   static Future<void> initDay() async {
+    final user = FirebaseAuth.instance.currentUser!;
     final doc = await ref.get();
 
     if (!doc.exists) {

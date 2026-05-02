@@ -52,9 +52,11 @@ class _TareasPageState extends State<TareasPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🔥 clave
+
     return Scaffold(
       drawer: const AppSidebar(),
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: theme.scaffoldBackgroundColor, // 🔥 dinámico
       resizeToAvoidBottomInset: false,
 
       floatingActionButton: _showFab
@@ -62,8 +64,8 @@ class _TareasPageState extends State<TareasPage> {
               padding: const EdgeInsets.only(bottom: 10),
               child: FloatingActionButton(
                 onPressed: () => openDialog(),
-                backgroundColor: const Color(0xFF6EC6CA),
-                child: const Icon(Icons.add, color: Colors.white),
+                backgroundColor: theme.colorScheme.primary, // 🔥 dinámico
+                child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
               ),
             )
           : null,
@@ -84,7 +86,6 @@ class _TareasPageState extends State<TareasPage> {
                 child: SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-
                     child: Column(
                       children: [
                         // 🔘 BOTÓN SIGUIENTE
@@ -104,17 +105,16 @@ class _TareasPageState extends State<TareasPage> {
                         Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.colorScheme.surface, // 🔥 dinámico
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.03),
+                                color: theme.shadowColor.withOpacity(0.05),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
                             ],
                           ),
-
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -125,18 +125,19 @@ class _TareasPageState extends State<TareasPage> {
                                   horizontal: 16,
                                   vertical: 10,
                                 ),
-                                decoration: const BoxDecoration(
-                                  color: Color.fromRGBO(245, 134, 169, 1),
-                                  borderRadius: BorderRadius.vertical(
+                                decoration: BoxDecoration(
+                                  color:
+                                      theme.colorScheme.tertiary, // 🔥 dinámico
+                                  borderRadius: const BorderRadius.vertical(
                                     top: Radius.circular(18),
                                   ),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   "Las tareas del día son:",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: theme.colorScheme.onTertiary,
                                   ),
                                 ),
                               ),
@@ -146,11 +147,16 @@ class _TareasPageState extends State<TareasPage> {
                                   ? Container(
                                       width: double.infinity,
                                       padding: const EdgeInsets.all(20),
-                                      child: const Center(
+                                      child: Center(
                                         child: Text(
                                           "Presiona + para agregar una tarea ✨",
                                           style: TextStyle(
-                                            color: Colors.grey,
+                                            color: theme
+                                                .colorScheme
+                                                .onBackground
+                                                .withOpacity(
+                                                  0.6,
+                                                ), // 🔥 dinámico
                                             fontSize: 14,
                                           ),
                                         ),
@@ -175,22 +181,21 @@ class _TareasPageState extends State<TareasPage> {
                                                   margin: const EdgeInsets.only(
                                                     right: 10,
                                                   ),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                        color: Color.fromRGBO(
-                                                          245,
-                                                          134,
-                                                          169,
-                                                          1,
-                                                        ),
-                                                        shape: BoxShape.circle,
-                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: theme
+                                                        .colorScheme
+                                                        .tertiary, // 🔥 dinámico
+                                                    shape: BoxShape.circle,
+                                                  ),
                                                 ),
                                                 Expanded(
                                                   child: Text(
                                                     t["titulo"] ?? "",
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 14,
+                                                      color: theme
+                                                          .colorScheme
+                                                          .onSurface,
                                                     ),
                                                   ),
                                                 ),
@@ -202,22 +207,29 @@ class _TareasPageState extends State<TareasPage> {
                                                         ),
                                                     child: Text(
                                                       t["hora"],
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                         fontSize: 12,
-                                                        color: Colors.grey,
+                                                        color: theme
+                                                            .colorScheme
+                                                            .outline,
                                                       ),
                                                     ),
                                                   )
                                                 else
-                                                  const Icon(
+                                                  Icon(
                                                     Icons.access_time,
                                                     size: 18,
-                                                    color: Colors.grey,
+                                                    color: theme
+                                                        .colorScheme
+                                                        .outline,
                                                   ),
                                                 IconButton(
-                                                  icon: const Icon(
+                                                  icon: Icon(
                                                     Icons.edit_outlined,
                                                     size: 18,
+                                                    color: theme
+                                                        .colorScheme
+                                                        .onSurface,
                                                   ),
                                                   padding: EdgeInsets.zero,
                                                   constraints:
@@ -232,7 +244,11 @@ class _TareasPageState extends State<TareasPage> {
                                               ],
                                             ),
                                             const SizedBox(height: 8),
-                                            const Divider(height: 1),
+                                            Divider(
+                                              height: 1,
+                                              color: theme.colorScheme.outline
+                                                  .withOpacity(0.3),
+                                            ),
                                             const SizedBox(height: 8),
                                           ],
                                         );
@@ -247,6 +263,7 @@ class _TareasPageState extends State<TareasPage> {
                         const TareasRepetitivasWidget(),
 
                         const SizedBox(height: 20),
+
                         // 💔 TAREAS INCONCLUSAS
                         const TareasInconclusasWidget(),
                       ],

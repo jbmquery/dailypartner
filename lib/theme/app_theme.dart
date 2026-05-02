@@ -64,53 +64,55 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.dark,
 
-      // 🎨 Fondo general (oscuro profundo)
-      scaffoldBackgroundColor: const Color(0xFF0F1720),
+      // 🎨 Fondo general (negro real como tu UI)
+      scaffoldBackgroundColor: const Color(0xFF0B0B0B),
 
-      // 🎯 Color principal (verde militar moderno)
-      primaryColor: const Color(0xFF4CAF50),
+      // 🎯 Color principal (azul tipo iconos del menú)
+      primaryColor: const Color(0xFF3D7BFF),
 
       colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF4CAF50), // Verde táctico
-        secondary: Color(0xFF00E5FF), // Cyan neón (toque gamer)
-        // ⚡ Acento fuerte
-        tertiary: Color(0xFFFF3B3B), // Rojo alerta
-        // 🧱 Superficies
-        surface: Color(0xFF1A1F24), // Cards oscuras
-        background: Color(0xFF0F1720), // Fondo base
-        // 🖊️ Texto
-        onPrimary: Colors.black,
-        onSecondary: Colors.black,
-        onTertiary: Colors.white,
-        onSurface: Colors.white,
-        onBackground: Colors.white,
+        primary: Color(0xFF3D7BFF), // Azul moderno (iconos)
+        secondary: Color(0xFFFF8C42), // Naranja suave (CTA tipo "Pro")
+        tertiary: Color(0xFF4CAF50), // Verde leve (badges / éxito)
+        // 🧱 Superficies (cards tipo gris oscuro elegante)
+        surface: Color(0xFF1C1C1E),
+        background: Color(0xFF0B0B0B),
 
-        // 🌫️ Detalles
-        outline: Color(0xFF3A3F44), // Bordes gris oscuro
+        // 🖊️ Texto
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onTertiary: Colors.white,
+        onSurface: Color(0xFFEAEAEA),
+        onBackground: Color(0xFFEAEAEA),
+
+        // 🌫️ Bordes y separadores suaves
+        outline: Color(0xFF2C2C2E),
         shadow: Colors.black,
       ),
 
-      // 🧾 Cards
-      cardColor: const Color(0xFF1A1F24),
+      // 🧾 Cards (igual que la imagen)
+      cardColor: const Color(0xFF1C1C1E),
 
       // ✍️ Texto global
-      textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
+      textTheme: const TextTheme(
+        bodyMedium: TextStyle(color: Color(0xFFEAEAEA)),
+      ),
 
-      // 📌 AppBar (modo comando)
+      // 📌 AppBar (oscura, elegante)
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF4CAF50),
-        foregroundColor: Colors.black,
+        backgroundColor: Color(0xFF0B0B0B),
+        foregroundColor: Colors.white,
         elevation: 0,
       ),
 
-      // 🔘 FAB (botón acción rápida)
+      // 🔘 FAB (azul consistente)
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: Color(0xFF00E5FF),
-        foregroundColor: Colors.black,
+        backgroundColor: Color(0xFF3D7BFF),
+        foregroundColor: Colors.white,
       ),
 
-      // 📏 Divider
-      dividerColor: Color(0xFF3A3F44),
+      // 📏 Divider (líneas sutiles)
+      dividerColor: Color(0xFF2C2C2E),
 
       // 🧊 Sombras
       shadowColor: Colors.black,
