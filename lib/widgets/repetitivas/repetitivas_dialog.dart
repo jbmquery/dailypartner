@@ -159,7 +159,7 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      color: theme.colorScheme.secondary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
@@ -167,13 +167,13 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                         Icon(
                           Icons.access_time,
                           size: 18,
-                          color: theme.colorScheme.primary,
+                          color: theme.colorScheme.secondary,
                         ),
                         const SizedBox(width: 6),
                         Text(
                           time ?? "Agregar hora",
                           style: TextStyle(
-                            color: theme.colorScheme.primary,
+                            color: theme.colorScheme.secondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -220,14 +220,14 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
+                        color: theme.colorScheme.secondary,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
                         child: Text(
                           "Guardar",
                           style: TextStyle(
-                            color: theme.colorScheme.onPrimary,
+                            color: theme.colorScheme.onSecondary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

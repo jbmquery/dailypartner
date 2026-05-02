@@ -111,9 +111,9 @@ class _ResumenPageState extends State<ResumenPage> {
 
     switch (source) {
       case "daily":
-        return theme.colorScheme.secondary;
+        return theme.colorScheme.error;
       case "repetitiva":
-        return theme.colorScheme.tertiary;
+        return theme.colorScheme.secondary;
       case "temp":
         return theme.colorScheme.primary;
       default:
@@ -202,7 +202,7 @@ class _ResumenPageState extends State<ResumenPage> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
+                          color: theme.primaryColor,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Row(
@@ -250,13 +250,13 @@ class _ResumenPageState extends State<ResumenPage> {
                                         height: 16,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: theme.colorScheme.primary,
+                                          color: theme.primaryColor,
                                         ),
                                       )
                                     : Text(
                                         "Guardar",
                                         style: TextStyle(
-                                          color: theme.colorScheme.primary,
+                                          color: theme.primaryColor,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
                                         ),
@@ -293,7 +293,8 @@ class _ResumenPageState extends State<ResumenPage> {
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.secondary,
+                                color:
+                                    theme.colorScheme.tertiary, // 🔥 dinámico
                                 borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(18),
                                 ),
@@ -303,7 +304,7 @@ class _ResumenPageState extends State<ResumenPage> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.onSecondary,
+                                  color: theme.colorScheme.onTertiary,
                                 ),
                               ),
                             ),
@@ -339,7 +340,7 @@ class _ResumenPageState extends State<ResumenPage> {
                                               Checkbox(
                                                 value: t["checked"],
                                                 activeColor:
-                                                    theme.colorScheme.secondary,
+                                                    theme.colorScheme.tertiary,
                                                 onChanged: (val) {
                                                   setState(() {
                                                     t["checked"] = val;

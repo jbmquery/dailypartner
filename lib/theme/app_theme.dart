@@ -13,15 +13,15 @@ class AppTheme {
       primaryColor: const Color(0xFF6EC6CA),
 
       colorScheme: const ColorScheme.light(
-        primary: Color(0xFF6EC6CA), // Turquesa (FAB, AppBar)
-        secondary: Color(0xFF3DAAD8), // Azul secundario
+        primary: Color(0xFFB197FC), // Turquesa (FAB, AppBar)
+        secondary: Color(0xFFF586A9), // Azul secundario
         // 🌸 Nuevo: Rosado (tu header y bullets)
-        tertiary: Color.fromRGBO(245, 134, 169, 1),
+        tertiary: Color(0xFF3DAAD8),
 
         // 🧱 Superficies
         surface: Colors.white, // Cards
         background: Color(0xFFF7F7F7), // Fondo general
-        error: Color(0xFFFF4D4F),
+        error: Color(0xFFFF6B6B),
 
         // 🖊️ Texto
         onPrimary: Colors.white,
