@@ -33,10 +33,20 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
     setState(() {
       tasks = snapshot.docs.map((doc) {
         final data = doc.data();
+
         return {
           "id": doc.id,
           "titulo": data["titulo"],
           "hora": data["hora_recordatorio"],
+
+          // 🔥 días (null-safe para evitar errores con docs antiguos)
+          "lunes": data["lunes"] ?? false,
+          "martes": data["martes"] ?? false,
+          "miercoles": data["miercoles"] ?? false,
+          "jueves": data["jueves"] ?? false,
+          "viernes": data["viernes"] ?? false,
+          "sabado": data["sabado"] ?? false,
+          "domingo": data["domingo"] ?? false,
         };
       }).toList();
     });
@@ -239,6 +249,26 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                           ],
                                         ),
 
+                                        // 🔥 DÍAS VISUALES
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 6,
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment
+                                                .center, // 🔥 centrado horizontal
+                                            children: [
+                                              _day("L", t["lunes"], theme),
+                                              _day("M", t["martes"], theme),
+                                              _day("M", t["miercoles"], theme),
+                                              _day("J", t["jueves"], theme),
+                                              _day("V", t["viernes"], theme),
+                                              _day("S", t["sabado"], theme),
+                                              _day("D", t["domingo"], theme),
+                                            ],
+                                          ),
+                                        ),
+
                                         const SizedBox(height: 8),
                                         Divider(
                                           height: 1,
@@ -261,4 +291,25 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
       ),
     );
   }
+}
+
+Widget _day(String label, bool active, ThemeData theme) {
+  return Container(
+    margin: const EdgeInsets.only(right: 6),
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    decoration: BoxDecoration(
+      color: active
+          ? theme.colorScheme.secondary.withOpacity(0.15)
+          : Colors.transparent,
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: active ? theme.colorScheme.secondary : theme.colorScheme.outline,
+      ),
+    ),
+  );
 }

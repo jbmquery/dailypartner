@@ -40,7 +40,7 @@ class TareasListWidget extends StatelessWidget {
         return Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: theme.cardColor, // 🔥 dinámico
+            color: theme.colorScheme.surface, // 🔥 dinámico
             borderRadius: BorderRadius.circular(18),
           ),
           child: Column(

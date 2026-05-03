@@ -18,6 +18,27 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
 
   String? time;
 
+  // 🔥 NUEVO: días
+  Map<String, bool> dias = {
+    "lunes": false,
+    "martes": false,
+    "miercoles": false,
+    "jueves": false,
+    "viernes": false,
+    "sabado": false,
+    "domingo": false,
+  };
+
+  final Map<String, String> diasShort = {
+    "lunes": "L",
+    "martes": "M",
+    "miercoles": "M",
+    "jueves": "J",
+    "viernes": "V",
+    "sabado": "S",
+    "domingo": "D",
+  };
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +46,11 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
     if (widget.task != null) {
       controller.text = widget.task!["titulo"] ?? "";
       time = widget.task!["hora_recordatorio"];
+
+      // 🔥 cargar días (compatibilidad con null)
+      for (var key in dias.keys) {
+        dias[key] = widget.task![key] ?? false;
+      }
     }
   }
 
@@ -50,6 +76,9 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
       "hora_recordatorio": time,
       "importancia": "normal",
       "actualizacion": FieldValue.serverTimestamp(),
+
+      // 🔥 NUEVO: días
+      ...dias,
     };
 
     if (widget.task == null) {
@@ -90,13 +119,13 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface, // 🔥 dinámico
+          color: theme.colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 🔘 HANDLE
+            // HANDLE
             Container(
               width: 40,
               height: 4,
@@ -107,7 +136,6 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
               ),
             ),
 
-            // 🧠 TITULO
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -122,7 +150,7 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
 
             const SizedBox(height: 14),
 
-            // ✍️ INPUT
+            // INPUT
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
@@ -131,10 +159,6 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
               ),
               child: TextField(
                 controller: controller,
-                autofocus: true,
-                textInputAction: TextInputAction.done,
-                enableSuggestions: false,
-                autocorrect: false,
                 style: TextStyle(color: theme.colorScheme.onBackground),
                 decoration: InputDecoration(
                   hintText: "¿Qué tienes que hacer?",
@@ -148,9 +172,10 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
 
             const SizedBox(height: 14),
 
-            // ⏰ HORA
+            // 🔥 HORA + DÍAS
             Row(
               children: [
+                // ⏰ hora
                 GestureDetector(
                   onTap: pickTime,
                   child: Container(
@@ -171,7 +196,7 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          time ?? "Agregar hora",
+                          time ?? "Agregar Hora",
                           style: TextStyle(
                             color: theme.colorScheme.secondary,
                             fontWeight: FontWeight.w500,
@@ -181,12 +206,59 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                     ),
                   ),
                 ),
+
+                const SizedBox(width: 6),
+
+                // 🔥 días
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: dias.keys.map((key) {
+                      final active = dias[key]!;
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            dias[key] = !active;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          width: 25,
+                          decoration: BoxDecoration(
+                            color: active
+                                ? theme.colorScheme.secondary
+                                : theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: active
+                                  ? theme.colorScheme.secondary
+                                  : theme.colorScheme.outline,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              diasShort[key]!,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: active
+                                    ? theme.colorScheme.onSecondary
+                                    : theme.colorScheme.outline,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ],
             ),
 
             const SizedBox(height: 20),
 
-            // 🔘 BOTONES
+            // BOTONES
             Row(
               children: [
                 if (widget.task != null)

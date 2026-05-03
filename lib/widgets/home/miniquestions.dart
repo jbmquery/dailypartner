@@ -135,7 +135,7 @@ class _MiniQuestionsState extends State<MiniQuestions> {
                 Icon(
                   isActive ? Icons.local_drink : Icons.local_drink_outlined,
                   color: isActive
-                      ? Color(0xFF3DAAD8)
+                      ? theme.primaryColor
                       : theme.colorScheme.outline, // 🔥 dinámico
                   size: 40,
                 ),

@@ -43,7 +43,7 @@ Widget _rachaUI(BuildContext context, int streak) {
   }
 
   // 🔥 mezcla con el tema
-  final color = Color.lerp(theme.colorScheme.primary, baseColor, 0.6)!;
+  final color = Color.lerp(theme.colorScheme.primary, baseColor, 1)!;
 
   double size = 18;
   if (streak > 10) size = 22;
@@ -54,7 +54,7 @@ Widget _rachaUI(BuildContext context, int streak) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.12),
+      color: color.withOpacity(0.25),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
@@ -97,13 +97,13 @@ class _FireIconState extends State<FireIcon>
     )..repeat(reverse: true);
 
     scale = Tween<double>(
-      begin: 1.0,
-      end: 1.25,
+      begin: 1.8,
+      end: 2.10,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     rotation = Tween<double>(
-      begin: -0.08,
-      end: 0.08,
+      begin: -0.15,
+      end: 0.15,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
