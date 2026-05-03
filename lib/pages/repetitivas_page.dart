@@ -37,7 +37,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
         return {
           "id": doc.id,
           "titulo": data["titulo"],
-          "hora": data["hora_recordatorio"],
+          "hora_recordatorio": data["hora_recordatorio"],
 
           // 🔥 días (null-safe para evitar errores con docs antiguos)
           "lunes": data["lunes"] ?? false,
@@ -206,14 +206,14 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
                                             ),
 
                                             // ⏰ HORA
-                                            if (t["hora"] != null)
+                                            if (t["hora_recordatorio"] != null)
                                               Padding(
                                                 padding:
                                                     const EdgeInsets.symmetric(
                                                       horizontal: 8,
                                                     ),
                                                 child: Text(
-                                                  t["hora"],
+                                                  t["hora_recordatorio"],
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: theme
