@@ -37,6 +37,21 @@ class _ResumenPageState extends State<ResumenPage> {
 
     final today = DateTime.now().toString().substring(0, 10);
 
+    // 🔥 día actual (lunes, martes, etc)
+    final nowDay = DateTime.now().weekday;
+
+    const diasMap = {
+      1: "lunes",
+      2: "martes",
+      3: "miercoles",
+      4: "jueves",
+      5: "viernes",
+      6: "sabado",
+      7: "domingo",
+    };
+
+    final diaHoy = diasMap[nowDay];
+
     final skipSnapshot = await FirebaseFirestore.instance
         .collection('tareas_repetitivas_skip')
         .where("uid", isEqualTo: user.uid)
@@ -60,12 +75,17 @@ class _ResumenPageState extends State<ResumenPage> {
         .map((doc) {
           final data = doc.data();
 
+          // 🔥 filtro por día (null-safe)
+          final activoHoy = data[diaHoy] ?? false;
+          if (!activoHoy) return null;
+
           final titulo = data["titulo"];
           final hora = data["hora_recordatorio"];
 
           final key =
               "${titulo.toString().trim().toLowerCase()}|${(hora ?? "").toString().trim().toLowerCase()}";
 
+          // 🔥 filtro por skip
           if (skipKeys.contains(key)) return null;
 
           return {
@@ -75,7 +95,7 @@ class _ResumenPageState extends State<ResumenPage> {
             "checked": false,
           };
         })
-        .whereType<Map<String, dynamic>>()
+        .whereType<Map<String, dynamic>>() // limpia nulls
         .toList();
 
     final dailyRef = FirebaseFirestore.instance

@@ -87,7 +87,7 @@ class _RepetitivasPageState extends State<RepetitivasPage> {
               child: FloatingActionButton(
                 onPressed: () => openDialog(),
                 backgroundColor: theme.colorScheme.secondary,
-                foregroundColor: theme.colorScheme.onPrimary,
+                foregroundColor: theme.colorScheme.onSecondary,
                 child: const Icon(Icons.add),
               ),
             )
