@@ -14,6 +14,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
 
   bool isPasswordVisible = false;
 
@@ -88,28 +89,53 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      String email = emailController.text;
-                      String password = passwordController.text;
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            if (isLoading) return;
 
-                      final auth = AuthService();
+                            setState(() {
+                              isLoading = true;
+                            });
 
-                      final userData = await auth.login(
-                        email: email,
-                        password: password,
-                      );
+                            try {
+                              String email = emailController.text.trim();
+                              String password = passwordController.text;
 
-                      if (userData == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Error al iniciar sesión"),
-                          ),
-                        );
-                        return;
-                      }
+                              final auth = AuthService();
 
-                      NavigationService.removeAll(context, const HomePage());
-                    },
+                              final userData = await auth.login(
+                                email: email,
+                                password: password,
+                              );
+
+                              if (userData == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Error al iniciar sesión"),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              NavigationService.removeAll(
+                                context,
+                                const HomePage(),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Ocurrió un error inesperado"),
+                                ),
+                              );
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF8A5C2),
                       foregroundColor: Colors.white, // 🔒 fijo
@@ -118,13 +144,22 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      "Entrar",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Entrar",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
 
@@ -167,6 +202,7 @@ class _LoginPageState extends State<LoginPage> {
   }) {
     return TextField(
       controller: controller,
+      enabled: !isLoading,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Color(0xFF6EC6CA)),
         hintText: hint,
@@ -193,6 +229,7 @@ class _LoginPageState extends State<LoginPage> {
     return TextField(
       controller: passwordController,
       obscureText: !isPasswordVisible,
+      enabled: !isLoading,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF6EC6CA)),
         hintText: "********",
@@ -204,11 +241,13 @@ class _LoginPageState extends State<LoginPage> {
             isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             color: Colors.grey,
           ),
-          onPressed: () {
-            setState(() {
-              isPasswordVisible = !isPasswordVisible;
-            });
-          },
+          onPressed: isLoading
+              ? null
+              : () {
+                  setState(() {
+                    isPasswordVisible = !isPasswordVisible;
+                  });
+                },
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

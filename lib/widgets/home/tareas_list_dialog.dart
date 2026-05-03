@@ -17,6 +17,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
 
   String? time;
   String importancia = "normal";
+  bool isLoading = false;
 
   bool get isEditing => widget.taskDoc != null;
 
@@ -46,30 +47,50 @@ class _TareasListDialogState extends State<TareasListDialog> {
   }
 
   Future<void> save() async {
-    if (controller.text.trim().isEmpty) return;
+    if (controller.text.trim().isEmpty || isLoading) return;
 
-    final data = {
-      "titulo": controller.text,
-      "hora_recordatorio": time,
-      "importancia": importancia,
-      "estado": "pendiente",
-      "actualizacion": FieldValue.serverTimestamp(),
-    };
+    setState(() {
+      isLoading = true;
+    });
 
-    if (isEditing) {
-      await widget.taskDoc!.reference.update(data);
-    } else {
-      await widget.dailyRef!.collection('tareas').add(data);
+    try {
+      final data = {
+        "titulo": controller.text,
+        "hora_recordatorio": time,
+        "importancia": importancia,
+        "estado": "pendiente",
+        "actualizacion": FieldValue.serverTimestamp(),
+      };
+
+      if (isEditing) {
+        await widget.taskDoc!.reference.update(data);
+      } else {
+        await widget.dailyRef!.collection('tareas').add(data);
+      }
+
+      Navigator.pop(context);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
     }
-
-    Navigator.pop(context);
   }
 
   Future<void> delete() async {
-    if (isEditing) {
+    if (!isEditing || isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
       await widget.taskDoc!.reference.delete();
+      Navigator.pop(context);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
     }
-    Navigator.pop(context);
   }
 
   @override
@@ -217,7 +238,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
                 if (isEditing)
                   Expanded(
                     child: GestureDetector(
-                      onTap: delete,
+                      onTap: isLoading ? null : delete,
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
@@ -225,13 +246,22 @@ class _TareasListDialogState extends State<TareasListDialog> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
-                          child: Text(
-                            "Eliminar",
-                            style: TextStyle(
-                              color: theme.colorScheme.error,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: isLoading
+                              ? SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: theme.colorScheme.error,
+                                  ),
+                                )
+                              : Text(
+                                  "Eliminar",
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -241,7 +271,7 @@ class _TareasListDialogState extends State<TareasListDialog> {
 
                 Expanded(
                   child: GestureDetector(
-                    onTap: save,
+                    onTap: isLoading ? null : save,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
@@ -249,13 +279,22 @@ class _TareasListDialogState extends State<TareasListDialog> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
-                        child: Text(
-                          "Guardar",
-                          style: TextStyle(
-                            color: theme.colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: isLoading
+                            ? SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.onPrimary,
+                                ),
+                              )
+                            : Text(
+                                "Guardar",
+                                style: TextStyle(
+                                  color: theme.colorScheme.onPrimary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ),

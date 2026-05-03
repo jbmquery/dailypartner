@@ -15,6 +15,7 @@ class RepetitivasDialog extends StatefulWidget {
 class _RepetitivasDialogState extends State<RepetitivasDialog> {
   final user = FirebaseAuth.instance.currentUser!;
   final TextEditingController controller = TextEditingController();
+  bool isLoading = false;
 
   String? time;
 
@@ -68,42 +69,66 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
   }
 
   Future<void> save() async {
-    final data = {
-      "uid": user.uid,
-      "titulo": controller.text,
-      "estado": "pendiente",
-      "recordatorio": time != null,
-      "hora_recordatorio": time,
-      "importancia": "normal",
-      "actualizacion": FieldValue.serverTimestamp(),
+    if (controller.text.trim().isEmpty || isLoading) return;
 
-      // 🔥 NUEVO: días
-      ...dias,
-    };
+    setState(() {
+      isLoading = true;
+    });
 
-    if (widget.task == null) {
-      await FirebaseFirestore.instance
-          .collection('tareas_repetitivas')
-          .add(data);
-    } else {
-      await FirebaseFirestore.instance
-          .collection('tareas_repetitivas')
-          .doc(widget.task!["id"])
-          .update(data);
+    try {
+      final data = {
+        "uid": user.uid,
+        "titulo": controller.text,
+        "estado": "pendiente",
+        "recordatorio": time != null,
+        "hora_recordatorio": time,
+        "importancia": "normal",
+        "actualizacion": FieldValue.serverTimestamp(),
+        ...dias,
+      };
+
+      if (widget.task == null) {
+        await FirebaseFirestore.instance
+            .collection('tareas_repetitivas')
+            .add(data);
+      } else {
+        await FirebaseFirestore.instance
+            .collection('tareas_repetitivas')
+            .doc(widget.task!["id"])
+            .update(data);
+      }
+
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
     }
-
-    Navigator.pop(context);
   }
 
   Future<void> delete() async {
-    if (widget.task != null) {
+    if (widget.task == null || isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
       await FirebaseFirestore.instance
           .collection('tareas_repetitivas')
           .doc(widget.task!["id"])
           .delete();
-    }
 
-    Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -264,7 +289,7 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                 if (widget.task != null)
                   Expanded(
                     child: GestureDetector(
-                      onTap: delete,
+                      onTap: isLoading ? null : delete,
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
@@ -272,13 +297,22 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
-                          child: Text(
-                            "Eliminar",
-                            style: TextStyle(
-                              color: theme.colorScheme.error,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: isLoading
+                              ? SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: theme.colorScheme.error,
+                                  ),
+                                )
+                              : Text(
+                                  "Eliminar",
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -288,7 +322,7 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
 
                 Expanded(
                   child: GestureDetector(
-                    onTap: save,
+                    onTap: isLoading ? null : save,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
@@ -296,13 +330,22 @@ class _RepetitivasDialogState extends State<RepetitivasDialog> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
-                        child: Text(
-                          "Guardar",
-                          style: TextStyle(
-                            color: theme.colorScheme.onSecondary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: isLoading
+                            ? SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.onSecondary,
+                                ),
+                              )
+                            : Text(
+                                "Guardar",
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSecondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ),
