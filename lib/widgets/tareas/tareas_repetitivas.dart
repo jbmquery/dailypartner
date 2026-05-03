@@ -14,6 +14,22 @@ class TareasRepetitivasWidget extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser!;
     final today = DateTime.now().toString().substring(0, 10);
 
+    // 🔥 día actual (lunes, martes, etc)
+    final now = DateTime.now();
+    final weekDay = now.weekday;
+
+    const diasMap = {
+      1: "lunes",
+      2: "martes",
+      3: "miercoles",
+      4: "jueves",
+      5: "viernes",
+      6: "sabado",
+      7: "domingo",
+    };
+
+    final diaHoy = diasMap[weekDay];
+
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('tareas_repetitivas')
@@ -24,7 +40,14 @@ class TareasRepetitivasWidget extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final tareas = snapshot.data!.docs;
+        final tareas = snapshot.data!.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+
+          // 🔥 si no existe el campo, lo tomamos como false
+          final activoHoy = data[diaHoy] ?? false;
+
+          return activoHoy == true;
+        }).toList();
 
         return FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance
