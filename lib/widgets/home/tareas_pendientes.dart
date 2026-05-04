@@ -4,8 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/daily_status_service.dart';
 
-class TareasPendientesWidget extends StatelessWidget {
+class TareasPendientesWidget extends StatefulWidget {
   const TareasPendientesWidget({super.key});
+
+  @override
+  State<TareasPendientesWidget> createState() => _TareasPendientesWidgetState();
+}
+
+class _TareasPendientesWidgetState extends State<TareasPendientesWidget> {
+  final Set<String> loadingTasks = {}; // 🔥 tareas bloqueadas
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +60,7 @@ class TareasPendientesWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.shadowColor.withOpacity(0.08), // 🔥 dinámico
+                    color: theme.shadowColor.withOpacity(0.08),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -69,7 +76,7 @@ class TareasPendientesWidget extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.error, // 🔥 dinámico
+                      color: theme.colorScheme.error,
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(18),
                       ),
@@ -79,7 +86,7 @@ class TareasPendientesWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSecondary, // 🔥 dinámico
+                        color: theme.colorScheme.onSecondary,
                       ),
                     ),
                   ),
@@ -107,108 +114,131 @@ class TareasPendientesWidget extends StatelessWidget {
       },
     );
   }
-}
 
-Widget _taskItemFirestore(BuildContext context, DocumentSnapshot doc) {
-  final theme = Theme.of(context);
-  final data = doc.data() as Map<String, dynamic>;
+  Widget _taskItemFirestore(BuildContext context, DocumentSnapshot doc) {
+    final isBlocked = loadingTasks.contains(doc.id);
+    final theme = Theme.of(context);
+    final data = doc.data() as Map<String, dynamic>;
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        data["titulo"] ?? "",
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          color: theme.colorScheme.onBackground, // 🔥 más consistente
-        ),
-      ),
-      const SizedBox(height: 8),
-      Row(
+    return Opacity(
+      opacity: isBlocked ? 0.6 : 1, // 🔥 feedback visual
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _miniButton(
-            context,
-            Icons.check,
-            "YALA",
-            Colors.green,
-            onTap: () {
-              doc.reference.update({"estado": "completado"});
-            },
+          Text(
+            data["titulo"] ?? "",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onBackground,
+            ),
           ),
-          const SizedBox(width: 6),
-          _miniButton(
-            context,
-            Icons.close,
-            "YA FUE",
-            Colors.red,
-            onTap: () {
-              doc.reference.update({"estado": "cancelado"});
-            },
-          ),
-          const SizedBox(width: 6),
-          _miniButton(
-            context,
-            Icons.refresh,
-            "HOY LO HAGO",
-            Colors.orange,
-            onTap: () async {
-              await moveTaskToToday(doc);
-            },
+          const SizedBox(height: 8),
+
+          Row(
+            children: [
+              _miniButton(
+                context,
+                Icons.check,
+                "YALA",
+                Colors.green,
+                isLoading: isBlocked,
+                onTap: () async {
+                  if (isBlocked) return;
+
+                  setState(() => loadingTasks.add(doc.id));
+
+                  await doc.reference.update({"estado": "completado"});
+                },
+              ),
+
+              const SizedBox(width: 6),
+
+              _miniButton(
+                context,
+                Icons.close,
+                "YA FUE",
+                Colors.red,
+                isLoading: isBlocked,
+                onTap: () async {
+                  if (isBlocked) return;
+
+                  setState(() => loadingTasks.add(doc.id));
+
+                  await doc.reference.update({"estado": "cancelado"});
+                },
+              ),
+
+              const SizedBox(width: 6),
+
+              _miniButton(
+                context,
+                Icons.refresh,
+                "HOY LO HAGO",
+                Colors.orange,
+                isLoading: isBlocked,
+                onTap: () async {
+                  if (isBlocked) return;
+
+                  setState(() => loadingTasks.add(doc.id));
+
+                  await moveTaskToToday(doc);
+                },
+              ),
+            ],
           ),
         ],
       ),
-    ],
-  );
+    );
+  }
 }
 
+// 🔥 botón reutilizable
 Widget _miniButton(
   BuildContext context,
   IconData? icon,
   String label,
   Color color, {
   VoidCallback? onTap,
+  bool isLoading = false,
 }) {
   final theme = Theme.of(context);
 
   return Expanded(
     child: GestureDetector(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 120),
-        padding: const EdgeInsets.symmetric(vertical: 8), // 👈 más compacto
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: color,
+          color: isLoading ? color.withOpacity(0.5) : color,
           borderRadius: BorderRadius.circular(12),
-
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.25), // 👈 sombra más sutil
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16, // 👈 más pequeño
-              color: theme.colorScheme.onPrimary,
-            ),
-
-            const SizedBox(height: 4),
-
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 10.5, // 👈 más fino
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onPrimary,
-              ),
-            ),
-          ],
+        child: Center(
+          child: isLoading
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(icon, size: 16, color: theme.colorScheme.onPrimary),
+                    const SizedBox(height: 4),
+                    Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onPrimary,
+                      ),
+                    ),
+                  ],
+                ),
         ),
       ),
     ),
@@ -238,9 +268,7 @@ Widget _emptyCard(BuildContext context) {
     child: Center(
       child: Text(
         "🎉 No tienes tareas pendientes",
-        style: TextStyle(
-          color: theme.colorScheme.onBackground, // 🔥 consistente
-        ),
+        style: TextStyle(color: theme.colorScheme.onBackground),
       ),
     ),
   );
