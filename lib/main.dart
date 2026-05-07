@@ -13,12 +13,19 @@ import 'services/theme_service.dart';
 import 'theme/app_theme.dart';
 import 'services/daily_status_service.dart';
 
+import 'services/notification_service.dart';
+import 'services/notification_sync_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await initializeDateFormatting();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await NotificationService.init();
+
+  await NotificationService.testNotification();
 
   runApp(const MiApp());
 }
@@ -66,6 +73,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user != null) {
         DailyStatusService.initDay();
+        // 🔔 sincroniza notificaciones
+        NotificationSyncService.syncTodayTasks();
       }
     });
   }

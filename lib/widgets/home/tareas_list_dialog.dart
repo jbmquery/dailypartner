@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../services/notification_sync_service.dart';
+
 class TareasListDialog extends StatefulWidget {
   final DocumentSnapshot? taskDoc;
   final DocumentReference? dailyRef;
@@ -68,6 +70,9 @@ class _TareasListDialogState extends State<TareasListDialog> {
         await widget.dailyRef!.collection('tareas').add(data);
       }
 
+      // 🔔 resincroniza notificaciones
+      await NotificationSyncService.syncTodayTasks();
+
       Navigator.pop(context);
     } catch (e) {
       setState(() {
@@ -85,6 +90,10 @@ class _TareasListDialogState extends State<TareasListDialog> {
 
     try {
       await widget.taskDoc!.reference.delete();
+
+      // 🔔 resincroniza notificaciones
+      await NotificationSyncService.syncTodayTasks();
+
       Navigator.pop(context);
     } catch (e) {
       setState(() {

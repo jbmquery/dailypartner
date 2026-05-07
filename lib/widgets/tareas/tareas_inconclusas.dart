@@ -76,7 +76,7 @@ class TareasInconclusasWidget extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      "Tareas pendientes",
+                      "Tareas pendientes | programadas",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
