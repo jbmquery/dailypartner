@@ -2,6 +2,7 @@
 import 'package:daily_partner/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_partner/pages/tema_page.dart';
+import 'package:daily_partner/pages/notas_page.dart';
 
 class AppSidebar extends StatelessWidget {
   const AppSidebar({super.key});
@@ -72,6 +73,32 @@ class AppSidebar extends StatelessWidget {
 
             _menuItem(
               context,
+              icon: Icons.groups_outlined,
+              title: "Dailys Grupales",
+              onTap: () {},
+            ),
+
+            _menuItem(
+              context,
+              icon: Icons.note_outlined,
+              title: "Notas",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const NotasPage()),
+                );
+              },
+            ),
+
+            _menuItem(
+              context,
+              icon: Icons.grid_goldenratio_sharp,
+              title: "Metas",
+              onTap: () {},
+            ),
+
+            _menuItem(
+              context,
               icon: Icons.history,
               title: "Historial",
               onTap: () {},
@@ -94,6 +121,20 @@ class AppSidebar extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const TemaPage()),
                 );
               },
+            ),
+
+            _menuItem(
+              context,
+              icon: Icons.gamepad_outlined,
+              title: "Juegos",
+              onTap: () {},
+            ),
+
+            _menuItem(
+              context,
+              icon: Icons.settings_outlined,
+              title: "Ajustes",
+              onTap: () {},
             ),
           ],
         ),

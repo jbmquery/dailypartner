@@ -9,6 +9,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 
 import 'notification_texts.dart';
 
+import 'dart:io';
+
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
@@ -18,13 +20,10 @@ class NotificationService {
   static Future<void> init() async {
     if (_initialized) return;
 
-    // 🔥 inicializa zonas horarias
     tz.initializeTimeZones();
 
-    // 🔥 obtiene timezone del dispositivo
     final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
 
-    // 🔥 configura timezone local
     tz.setLocalLocation(tz.getLocation(currentTimeZone));
 
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -33,12 +32,25 @@ class NotificationService {
 
     await _notifications.initialize(settings);
 
-    // 🔥 Android 13+
+    // 🔔 permiso Android 13+
     await _notifications
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.requestNotificationsPermission();
+
+    // 🔥 PERMISO EXACT ALARM
+    if (Platform.isAndroid) {
+      final androidImplementation = _notifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+
+      final granted = await androidImplementation
+          ?.requestExactAlarmsPermission();
+
+      debugPrint("🚨 EXACT ALARM: $granted");
+    }
 
     _initialized = true;
   }
@@ -87,26 +99,35 @@ class NotificationService {
     required String time,
   }) async {
     final parsed = _parseTime(time);
-    if (parsed == null) return;
+
+    if (parsed == null) {
+      debugPrint("❌ parsed NULL");
+      return;
+    }
 
     final now = DateTime.now();
+
+    debugPrint("🕒 AHORA: $now");
+    debugPrint("🕒 PARSED: $parsed");
 
     final scheduled = parsed.isBefore(now)
         ? parsed.add(const Duration(days: 1))
         : parsed;
 
+    debugPrint("🚀 PROGRAMADA PARA: $scheduled");
+
     final tzTime = tz.TZDateTime.from(scheduled, tz.local);
 
     await _notifications.zonedSchedule(
       id.hashCode,
-      NotificationTexts.title,
-      NotificationTexts.body(title),
+      NotificationTexts.notificationTitle("normal"),
+      NotificationTexts.notificationBody(title),
       tzTime,
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'daily_channel',
-          'Daily Notifications',
-          channelDescription: 'Recordatorios de tareas diarias',
+          NotificationTexts.channelId,
+          NotificationTexts.channelName,
+          channelDescription: NotificationTexts.channelDescription,
 
           importance: Importance.max,
           priority: Priority.high,
@@ -121,6 +142,8 @@ class NotificationService {
           UILocalNotificationDateInterpretation.absoluteTime,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
+
+    debugPrint("✅ NOTIFICACIÓN PROGRAMADA");
   }
 
   /// ❌ CANCELAR
