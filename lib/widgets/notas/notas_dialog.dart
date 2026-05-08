@@ -46,6 +46,48 @@ class _NotasDialogState extends State<NotasDialog> {
     return "$fecha  |  $caracteres caracteres";
   }
 
+  void insertBullet() {
+    final text = bodyController.text;
+    final selection = bodyController.selection;
+
+    final newText = text.replaceRange(selection.start, selection.end, "• ");
+
+    bodyController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: selection.start + 2),
+    );
+
+    setState(() {});
+  }
+
+  void insertNumber() {
+    final text = bodyController.text;
+    final selection = bodyController.selection;
+
+    int lineNumber = 1;
+
+    final lines = text.split('\n');
+
+    for (final line in lines) {
+      if (RegExp(r'^\d+\.').hasMatch(line.trim())) {
+        lineNumber++;
+      }
+    }
+
+    final insert = "$lineNumber. ";
+
+    final newText = text.replaceRange(selection.start, selection.end, insert);
+
+    bodyController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(
+        offset: selection.start + insert.length,
+      ),
+    );
+
+    setState(() {});
+  }
+
   Future<void> save() async {
     if (isLoading) return;
 
@@ -110,6 +152,27 @@ class _NotasDialogState extends State<NotasDialog> {
     }
   }
 
+  Widget toolButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    required ThemeData theme,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.secondary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: Icon(icon, size: 18, color: theme.colorScheme.secondary),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -133,7 +196,6 @@ class _NotasDialogState extends State<NotasDialog> {
                 top: Radius.circular(22),
               ),
             ),
-
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -174,21 +236,41 @@ class _NotasDialogState extends State<NotasDialog> {
 
                 const SizedBox(height: 12),
 
-                // FECHA + CARACTERES
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: AnimatedBuilder(
-                    animation: bodyController,
-                    builder: (_, __) {
-                      return Text(
-                        currentInfo(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: theme.colorScheme.outline,
-                        ),
-                      );
-                    },
-                  ),
+                // FECHA + CARACTERES + HERRAMIENTAS
+                Row(
+                  children: [
+                    Expanded(
+                      child: AnimatedBuilder(
+                        animation: bodyController,
+                        builder: (_, __) {
+                          return Text(
+                            currentInfo(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.colorScheme.outline,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    toolButton(
+                      icon: Icons.format_list_bulleted,
+                      onTap: insertBullet,
+                      theme: theme,
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    toolButton(
+                      icon: Icons.format_list_numbered,
+                      onTap: insertNumber,
+                      theme: theme,
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 14),
