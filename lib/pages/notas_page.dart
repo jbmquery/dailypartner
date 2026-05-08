@@ -32,6 +32,8 @@ class _NotasPageState extends State<NotasPage> {
       builder: (_) => NotasDialog(noteDoc: noteDoc),
     );
 
+    if (!mounted) return;
+
     setState(() {
       _showFab = true;
     });
@@ -73,23 +75,6 @@ class _NotasPageState extends State<NotasPage> {
 
             const SizedBox(height: 18),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Notas",
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w300,
-                    color: theme.colorScheme.onBackground,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
@@ -98,15 +83,27 @@ class _NotasPageState extends State<NotasPage> {
                     .orderBy("fecha_creacion", descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  // 🔥 loading
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  // 🔥 loading inicial
+                  if (snapshot.connectionState == ConnectionState.waiting &&
+                      !snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  // 🔥 evita crashes
-                  if (!snapshot.hasData ||
-                      snapshot.data == null ||
-                      snapshot.data!.docs.isEmpty) {
+                  // 🔥 error
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        "Error cargando notas",
+                        style: TextStyle(color: theme.colorScheme.outline),
+                      ),
+                    );
+                  }
+
+                  // 🔥 docs seguros
+                  final docs = snapshot.data?.docs ?? [];
+
+                  // 🔥 vacío real
+                  if (docs.isEmpty) {
                     return Center(
                       child: Text(
                         "Todavía no tienes notas ✨",
@@ -117,8 +114,6 @@ class _NotasPageState extends State<NotasPage> {
                       ),
                     );
                   }
-
-                  final docs = snapshot.data!.docs;
 
                   return GridView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
@@ -137,7 +132,7 @@ class _NotasPageState extends State<NotasPage> {
 
                       final titulo = data["titulo"] ?? "Sin título";
                       final cuerpo = data["cuerpo"] ?? "";
-                      final fecha = data["fecha_creacion"];
+                      final fecha = data["fecha_creacion"] as Timestamp?;
 
                       return GestureDetector(
                         onTap: () => openDialog(noteDoc: doc),
@@ -154,16 +149,17 @@ class _NotasPageState extends State<NotasPage> {
                               ),
                             ],
                           ),
-
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                titulo,
+                                titulo.toString().trim().isEmpty
+                                    ? "Sin título"
+                                    : titulo,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 22,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.w500,
                                   color: theme.colorScheme.onSurface,
                                 ),
@@ -173,7 +169,9 @@ class _NotasPageState extends State<NotasPage> {
 
                               Expanded(
                                 child: Text(
-                                  cuerpo.isEmpty ? "Sin contenido" : cuerpo,
+                                  cuerpo.toString().trim().isEmpty
+                                      ? "Sin contenido"
+                                      : cuerpo,
                                   maxLines: 7,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
